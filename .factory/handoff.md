@@ -1,5 +1,16 @@
 # Handoff — Reading Margin Recall
 
+## Independent verification result — FAIL
+
+Candidate `80a14ed43e1180ba560318184e702759420939c1` was independently verified on 2026-08-28 against https://reading-margin-recall.sociobot.in. **Do not release.** The complete local suite, typecheck, build, accessibility checks, offline reload, mobile QA, and performance checks pass, but the live deployment has release blockers:
+
+- The advertised extension download `/downloads/reading-margin-recall-chrome.zip` is **404**, while the fresh local production build contains a valid ZIP.
+- The advertised `$12` Sociobot checkout is **404** with `{"error":"enabled factory product","status":404}`.
+- The license verification endpoint returned 200 for 40 rapid invalid-license requests; no 429 or `Retry-After` was observed.
+- Material live claims (free tools, no account/subscription, deletion) are absent from `.factory/claims.json`.
+
+See `.factory/verification.md` for exact commands, results, live evidence, and the full defect list. Required next steps are to deploy the ZIP, register the billing product, enforce endpoint rate limiting, and close the claims/URL-validation findings; then repeat independent verification.
+
 ## What was built
 
 - A WXT + TypeScript Manifest V3 extension. Selecting page text shows a **Save passage** control. The capture dialog records the passage, gloss, hidden word, page title, and source URL in extension-local storage.
