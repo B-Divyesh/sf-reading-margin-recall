@@ -49,10 +49,31 @@
     "sandbox": "fresh demo data; press Space then 3 and assert the answer is revealed and graded"
   },
   {
-    "id": "paid-study-edition",
-    "claim": "Study Edition costs $12 once and uses Sociobot checkout.",
-    "where": "landing pricing, terms, README",
-    "test": "npm test -- --grep @claim:paid-study-edition",
-    "sandbox": "fresh landing page; assert exact price, checkout URL, and restore control"
+    "id": "free-tools",
+    "claim": "Every tool is free to use without an account or subscription.",
+    "where": "landing included section, terms, README",
+    "test": "npm test -- --grep @claim:free-tools",
+    "sandbox": "fresh browser context; use both review filters and assert no sign-in, license gate, or cross-origin request"
+  },
+  {
+    "id": "delete-notes",
+    "claim": "Delete any saved note from this device.",
+    "where": "landing privacy list, privacy page",
+    "test": "npm test -- --grep @claim:delete-notes",
+    "sandbox": "fresh browser context; seed one local note, confirm deletion, and assert it is absent from the page and storage"
+  },
+  {
+    "id": "extension-download",
+    "claim": "Downloads an installable Manifest V3 extension package.",
+    "where": "notes empty state, README",
+    "test": "npm test -- --grep @claim:extension-download",
+    "sandbox": "fresh production build and preview; request the public ZIP, assert a non-empty response, validate the archive, and inspect its MV3 manifest"
+  },
+  {
+    "id": "http-source-links",
+    "claim": "Source links accept only http: and https: addresses.",
+    "where": "capture form help, README",
+    "test": "npm test -- --grep @claim:http-source-links",
+    "sandbox": "fresh browser context; submit a javascript: source URL and assert an accessible error with no saved executable link"
   }
 ]

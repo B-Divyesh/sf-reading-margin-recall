@@ -24,6 +24,44 @@ test('mobile layout stays within 390px', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Try it with sample data' })).toBeVisible();
 });
 
+test('keyboard focus and reduced motion remain usable at 390px', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.keyboard.press('Tab');
+  const skip = page.getByRole('link', { name: 'Skip to main content' });
+  await expect(skip).toBeFocused();
+  const focus = await skip.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { width: style.outlineWidth, style: style.outlineStyle };
+  });
+  expect(Number.parseFloat(focus.width)).toBeGreaterThanOrEqual(3);
+  expect(focus.style).not.toBe('none');
+  const motion = await page.locator('.button').first().evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { animation: style.animationDuration, transition: style.transitionDuration };
+  });
+  expect(Number.parseFloat(motion.animation) || 0).toBeLessThanOrEqual(0.001);
+  expect(Number.parseFloat(motion.transition) || 0).toBeLessThanOrEqual(0.001);
+  await skip.press('Enter');
+  await expect(page.locator('main')).toBeFocused();
+});
+
+test('deployment policy keeps execution and requests same-origin', async () => {
+  const config = JSON.parse(await readFile('site/public/staticwebapp.config.json', 'utf8')) as {
+    globalHeaders: Record<string, string>;
+    navigationFallback: { exclude: string[] };
+  };
+  const csp = config.globalHeaders['Content-Security-Policy'];
+  expect(csp).toContain("default-src 'self'");
+  expect(csp).toContain("connect-src 'self'");
+  expect(csp).toContain("form-action 'self'");
+  expect(csp).not.toContain('api.sociobot.in');
+  expect(config.navigationFallback.exclude).toContain('/downloads/*');
+  expect(config.globalHeaders['X-Content-Type-Options']).toBe('nosniff');
+  expect(config.globalHeaders['Referrer-Policy']).toBe('strict-origin-when-cross-origin');
+});
+
 test('extension build is packaged as MV3', async () => {
   await access('dist/site/downloads/reading-margin-recall-chrome.zip');
   const manifest = JSON.parse(await readFile('.output/chrome-mv3/manifest.json', 'utf8')) as { manifest_version: number; content_scripts?: unknown[] };

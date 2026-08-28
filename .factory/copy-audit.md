@@ -20,10 +20,9 @@ Audited 2026-08-28. Counts treat contractions and hyphenated forms as one word. 
 | Your reading stays yours | 4 | Pass |
 | The extension captures only text you select. | 7 | Pass |
 | It does not fetch books, translate pages, or bypass access controls. | 11 | Pass |
-| Add focused review views | 4 | Pass |
-| Keep every core tool free. | 5 | Pass |
-| Study Edition adds difficult-only and source-specific review filters. | 8 | Pass |
-| Paste the token from your receipt. | 6 | Pass |
+| Focus each review | 3 | Pass |
+| Every tool is free to use. | 6 | Pass |
+| No account or subscription is required. | 6 | Pass |
 
 ## Terminology
 
@@ -34,5 +33,4 @@ Audited 2026-08-28. Counts treat contractions and hyphenated forms as one word. 
 | The learner’s meaning | gloss |
 | The recalled text | hidden word |
 | Original location | source |
-| Paid add-on | Study Edition |
 | Isolated sample mode | demo |
