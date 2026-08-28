@@ -7,7 +7,7 @@ export default defineContentScript({
   main() {
     const host = document.createElement('div');
     host.id = 'reading-margin-recall-root';
-    const shadow = host.attachShadow({ mode: 'closed' });
+    const shadow = host.attachShadow({ mode: 'open' });
     document.documentElement.append(host);
     let selectedText = '';
 

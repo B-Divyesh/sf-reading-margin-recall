@@ -48,9 +48,11 @@ function icon(): string {
 
 function header(): string {
   const demoHref = (path: string) => demoMode ? `${path}?demo=1` : path;
+  const licenseNotice = !demoMode && localStorage.getItem(`sb_license:${SLUG}`) && localStorage.getItem(`sb_license_verdict:${SLUG}`) && !licenseIsActive()
+    ? `<aside class="license-notice">This license is no longer active. <a href="${BUY_URL}" rel="external">Buy Study Edition again</a>.</aside>` : '';
   return `<a class="skip-link" href="#main">Skip to main content</a>
     ${demoMode ? `<aside class="demo-banner" aria-label="Demo mode"><span><strong>Demo</strong> — sample data, nothing is saved to your notes.</span><div><button class="quiet-button" data-action="reset-demo">Reset demo</button><button class="quiet-button" data-action="start-real">Start for real</button></div></aside>` : ''}
-    <header class="site-header">
+    ${licenseNotice}<header class="site-header">
       <a class="wordmark nav-link" href="/" aria-label="Reading Margin Recall home">${icon()}<span>Reading Margin<br><em>Recall</em></span></a>
       <nav aria-label="Main navigation"><a class="nav-link" href="/demo">Demo</a><a class="nav-link" href="${demoHref('/library')}">My notes</a><a class="nav-link" href="${demoHref('/review')}">Review</a><a class="nav-link" href="${demoHref('/privacy')}">Privacy</a></nav>
       <button class="theme-button" data-action="theme" aria-label="Change color theme" title="Change color theme"><span aria-hidden="true">◐</span></button>
@@ -99,13 +101,19 @@ function library(): string {
 }
 
 function review(): string {
-  const notes = readNotes();
+  const allNotes = readNotes();
+  const licensed = !demoMode && licenseIsActive();
+  const filters = new URLSearchParams(location.search);
+  const difficultOnly = licensed && filters.get('difficult') === '1';
+  const sourceFilter = licensed ? filters.get('source') ?? '' : '';
+  const notes = allNotes.filter((note) => (!difficultOnly || (note.lastGrade ?? 1) <= 2) && (!sourceFilter || note.sourceTitle === sourceFilter));
   const now = Date.now();
   const due = notes.filter((note) => new Date(note.dueAt).getTime() <= now).sort((a, b) => a.dueAt.localeCompare(b.dueAt));
   const note = due[0] ?? notes[0];
-  if (!note) return shell(`<section class="center-state section-pad"><p class="eyebrow">Review desk</p><h1>Review saved passages</h1><div class="empty-state"><h2>No notes are ready</h2><p>Save a passage first. Its first review starts right away.</p><a class="button primary nav-link" href="/library">Add a passage</a></div></section>`);
+  const filterBar = licensed ? `<form id="review-filters" class="review-filters"><label><input type="checkbox" name="difficult" value="1" ${difficultOnly ? 'checked' : ''}> Difficult notes only</label><label for="source-filter">Source</label><select id="source-filter" name="source"><option value="">Every source</option>${[...new Set(allNotes.map((item) => item.sourceTitle))].map((source) => `<option ${source === sourceFilter ? 'selected' : ''}>${e(source)}</option>`).join('')}</select></form>` : '';
+  if (!note) return shell(`<section class="center-state section-pad"><p class="eyebrow">Review desk</p><h1>Review saved passages</h1>${filterBar}<div class="empty-state"><h2>${allNotes.length ? 'No notes match these filters' : 'No notes are ready'}</h2><p>${allNotes.length ? 'Change a Study Edition filter to see more notes.' : 'Save a passage first. Its first review starts right away.'}</p><a class="button primary nav-link" href="/library">Add a passage</a></div></section>`);
   const passage = revealAnswer ? note.passage : clozePassage(note);
-  return shell(`<section class="review-page section-pad" data-note-id="${e(note.id)}"><p class="eyebrow">Review ${Math.min(notes.length, notes.length - due.length + 1)} of ${notes.length}</p><h1>Recall the missing word</h1><article class="review-sheet"><div class="specimen-tab">${e(note.sourceTitle)}</div><blockquote>${e(passage)}</blockquote><p class="gloss-label">Your gloss</p><p class="review-gloss">${e(note.gloss)}</p>${revealAnswer ? `<p class="answer">Hidden word: <strong>${e(note.deletion)}</strong></p><fieldset class="grade-field"><legend>How well did you recall it?</legend><div><button class="grade" data-grade="1"><kbd>1</kbd> Again</button><button class="grade" data-grade="2"><kbd>2</kbd> Hard</button><button class="grade" data-grade="3"><kbd>3</kbd> Good</button><button class="grade" data-grade="4"><kbd>4</kbd> Easy</button></div></fieldset>` : `<button class="button primary reveal" data-action="reveal">Reveal answer <kbd>Space</kbd></button>`}<a class="source-return" href="${e(note.sourceUrl)}" rel="external">Return to “${e(note.sourceTitle)}” <span class="sr-only">(external)</span> ↗</a></article><p class="keyboard-note">Keyboard: Space reveals. Keys 1–4 grade your answer.</p></section>`);
+  return shell(`<section class="review-page section-pad" data-note-id="${e(note.id)}"><p class="eyebrow">Review ${Math.min(notes.length, notes.length - due.length + 1)} of ${notes.length}</p><h1>Recall the missing word</h1>${filterBar}<article class="review-sheet"><div class="specimen-tab">${e(note.sourceTitle)}</div><blockquote>${e(passage)}</blockquote><p class="gloss-label">Your gloss</p><p class="review-gloss">${e(note.gloss)}</p>${revealAnswer ? `<p class="answer">Hidden word: <strong>${e(note.deletion)}</strong></p><fieldset class="grade-field"><legend>How well did you recall it?</legend><div><button class="grade" data-grade="1"><kbd>1</kbd> Again</button><button class="grade" data-grade="2"><kbd>2</kbd> Hard</button><button class="grade" data-grade="3"><kbd>3</kbd> Good</button><button class="grade" data-grade="4"><kbd>4</kbd> Easy</button></div></fieldset>` : `<button class="button primary reveal" data-action="reveal">Reveal answer <kbd>Space</kbd></button>`}<a class="source-return" href="${e(note.sourceUrl)}" rel="external">Return to “${e(note.sourceTitle)}” <span class="sr-only">(external)</span> ↗</a></article><p class="keyboard-note">Keyboard: Space reveals. Keys 1–4 grade your answer.</p></section>`);
 }
 
 function privacy(): string {
@@ -160,6 +168,21 @@ function bindEvents() {
   (form?.elements.namedItem('passage') as HTMLTextAreaElement | null)?.addEventListener('input', updateDeletionChoices);
   document.querySelector<HTMLInputElement>('#import-file')?.addEventListener('change', importNotes);
   document.querySelector<HTMLFormElement>('#license-form')?.addEventListener('submit', restoreLicense);
+  document.querySelector<HTMLFormElement>('#review-filters')?.addEventListener('change', applyReviewFilters);
+}
+
+function licenseIsActive(): boolean {
+  try { return JSON.parse(localStorage.getItem(`sb_license_verdict:${SLUG}`) ?? '{}').valid === true; } catch { return false; }
+}
+
+function applyReviewFilters(event: Event) {
+  const form = event.currentTarget as HTMLFormElement;
+  const data = new FormData(form);
+  const url = new URL(location.href);
+  data.get('difficult') ? url.searchParams.set('difficult', '1') : url.searchParams.delete('difficult');
+  const source = String(data.get('source') ?? '');
+  source ? url.searchParams.set('source', source) : url.searchParams.delete('source');
+  navigate(url);
 }
 
 function handleAction(event: Event) {
@@ -245,12 +268,26 @@ function acceptReturnedLicense() {
   localStorage.setItem(`sb_license:${SLUG}`, token); url.searchParams.delete('license'); history.replaceState({}, '', `${url.pathname}${url.search}`);
 }
 
+async function verifyStoredLicense() {
+  if (demoMode) return;
+  const token = localStorage.getItem(`sb_license:${SLUG}`); if (!token) return;
+  let cached: { checkedAt?: number } = {};
+  try { cached = JSON.parse(localStorage.getItem(`sb_license_verdict:${SLUG}`) ?? '{}'); } catch { /* check now */ }
+  if (cached.checkedAt && Date.now() - cached.checkedAt < 86_400_000) return;
+  try {
+    const response = await fetch(`${VERIFY_URL}?license=${encodeURIComponent(token)}`);
+    const result = await response.json() as { valid: boolean; reason?: string };
+    localStorage.setItem(`sb_license_verdict:${SLUG}`, JSON.stringify({ valid: result.valid, reason: result.reason, checkedAt: Date.now() }));
+    if (location.pathname === '/review') render();
+  } catch { /* Keep the cached state while offline. */ }
+}
+
 function setConnectionState() {
   document.body.dataset.connection = navigator.onLine ? 'online' : 'offline';
   announce(navigator.onLine ? 'Back online.' : 'Offline. Saved notes still work.');
 }
 
-acceptReturnedLicense(); render(); setConnectionState();
+acceptReturnedLicense(); render(); setConnectionState(); void verifyStoredLicense();
 addEventListener('popstate', () => { demoMode = location.pathname === '/demo' || new URLSearchParams(location.search).get('demo') === '1'; render(true); });
 addEventListener('online', setConnectionState); addEventListener('offline', setConnectionState);
 addEventListener('keydown', (event) => {

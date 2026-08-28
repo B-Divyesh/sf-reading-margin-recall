@@ -9,6 +9,8 @@ The product has two parts:
 - A Manifest V3 browser extension captures selected text on any normal web page.
 - A local PWA provides capture, review, JSON backup, and the one-click demo.
 
+Each part keeps its own local notes. Use JSON export and import when moving a collection between browsers.
+
 Reading notes stay in browser storage. Capture and review make no third-party requests. The installed PWA works offline after its first visit. The demo uses separate `demo:` storage and never touches real notes.
 
 ## Try the demo

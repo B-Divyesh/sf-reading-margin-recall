@@ -1,0 +1,58 @@
+[
+  {
+    "id": "source-linked-capture",
+    "claim": "Saves a selected passage with a gloss, hidden word, and source link.",
+    "where": "landing steps, capture form, README",
+    "test": "npm test -- --grep @claim:source-linked-capture",
+    "sandbox": "fresh browser context; create one note and assert its text and source URL"
+  },
+  {
+    "id": "extension-selection",
+    "claim": "The extension captures only selected text into its own local store.",
+    "where": "landing privacy section, README",
+    "test": "npm test -- --grep @claim:extension-selection",
+    "sandbox": "fresh Chromium profile with the built extension; select one sentence, assert the capture dialog contains only that sentence, then save"
+  },
+  {
+    "id": "demo-isolated",
+    "claim": "Demo changes never touch real notes.",
+    "where": "landing action note, demo banner, README",
+    "test": "npm test -- --grep @claim:demo-isolated",
+    "sandbox": "seed a real namespace; reset and leave demo; assert the real note remains and demo storage is removed"
+  },
+  {
+    "id": "local-only",
+    "claim": "Reading notes stay on this device with no tracking requests.",
+    "where": "landing facts and privacy section, README",
+    "test": "npm test -- --grep @claim:local-only",
+    "sandbox": "fresh demo context; intercept the full capture flow and assert every request is same-origin"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "Works offline after the first visit.",
+    "where": "landing facts, README",
+    "test": "npm test -- --grep @claim:offline-reload",
+    "sandbox": "fresh demo context; wait for service worker, set context offline, reload, and assert three notes remain"
+  },
+  {
+    "id": "json-backup",
+    "claim": "Exports and restores every reading note as JSON.",
+    "where": "privacy section, notes toolbar, README",
+    "test": "npm test -- --grep @claim:json-backup",
+    "sandbox": "fresh demo data; export all three notes, import one from that backup, and assert the restored count"
+  },
+  {
+    "id": "keyboard-review",
+    "claim": "Space reveals an answer and keys 1–4 grade recall.",
+    "where": "review screen, README",
+    "test": "npm test -- --grep @claim:keyboard-review",
+    "sandbox": "fresh demo data; press Space then 3 and assert the answer is revealed and graded"
+  },
+  {
+    "id": "paid-study-edition",
+    "claim": "Study Edition costs $12 once and uses Sociobot checkout.",
+    "where": "landing pricing, terms, README",
+    "test": "npm test -- --grep @claim:paid-study-edition",
+    "sandbox": "fresh landing page; assert exact price, checkout URL, and restore control"
+  }
+]

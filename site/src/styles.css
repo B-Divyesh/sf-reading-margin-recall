@@ -85,6 +85,7 @@ blockquote { margin-inline: 0; font-family: var(--display); }
 .theme-button { width: 44px; padding: 0; border: 1px solid var(--ink-soft); border-radius: 50%; background: transparent; font-size: 1.3rem; }
 .demo-banner { position: relative; z-index: 40; display: flex; justify-content: center; align-items: center; gap: 24px; min-height: 48px; padding: 6px 20px; background: var(--pollen); color: #18261f; font-size: .9rem; }
 .demo-banner div { display: flex; gap: 8px; }
+.license-notice { padding: 10px 20px; background: var(--paper-deep); color: var(--ink); text-align: center; font-size: .88rem; }
 
 main { overflow: clip; }
 .section-pad { max-width: 1440px; margin-inline: auto; padding: clamp(64px, 9vw, 120px) clamp(20px, 5vw, 72px); }
@@ -125,7 +126,7 @@ mark { padding: 0 .12em; background: color-mix(in srgb, var(--pollen) 35%, trans
 .steps > h2 { margin-bottom: 48px; }
 .steps ol { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 6vw, 80px); margin: 0; padding: 0; list-style: none; counter-reset: steps; }
 .steps li { position: relative; padding-top: 18px; border-top: 1px solid var(--ink); }
-.steps li > span { position: absolute; top: -14px; right: 0; padding: 0 8px; background: var(--paper); color: var(--pollen); font: 700 1rem var(--display); }
+.steps li > span { position: absolute; top: -14px; right: 0; padding: 0 8px; background: var(--paper); color: var(--fern-dark); font: 700 1rem var(--display); }
 .steps h3 { margin-bottom: 10px; }
 .steps p { margin: 0; color: var(--ink-soft); }
 .boundaries { display: grid; grid-template-columns: 1.35fr .65fr; gap: clamp(40px, 10vw, 140px); background: var(--ink); color: var(--paper); max-width: none; padding-inline: max(clamp(20px, 5vw, 72px), calc((100vw - 1440px) / 2 + 72px)); }
@@ -166,7 +167,7 @@ mark { padding: 0 .12em; background: color-mix(in srgb, var(--pollen) 35%, trans
 .file-label input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .note-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 0; list-style: none; }
 .note-card { position: relative; display: flex; flex-direction: column; min-height: 310px; padding: 32px; border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); background: var(--sheet); box-shadow: 4px 4px 0 var(--paper-deep); clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%); }
-.specimen-number { color: var(--pollen); font: 700 .8rem var(--body); letter-spacing: .1em; }
+.specimen-number { color: var(--fern-dark); font: 700 .8rem var(--body); letter-spacing: .1em; }
 .note-card blockquote { margin: 20px 0 14px; font-size: 1.35rem; line-height: 1.4; }
 .note-gloss { margin: 0; color: var(--ink-soft); }
 .note-card dl { display: flex; gap: 24px; margin-top: auto; padding-top: 24px; }
@@ -180,6 +181,11 @@ mark { padding: 0 .12em; background: color-mix(in srgb, var(--pollen) 35%, trans
 
 .review-page { min-height: 70vh; }
 .review-page h1 { max-width: 15ch; font-size: clamp(2.7rem, 7vw, 5rem); }
+.review-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; max-width: 960px; margin: 28px auto 0; padding: 12px 16px; border-block: 1px solid var(--ink-soft); }
+.review-filters label { font-weight: 800; }
+.review-filters label:first-child { display: flex; align-items: center; gap: 8px; }
+.review-filters input { min-width: 22px; min-height: 22px; }
+.review-filters select { padding: 6px 10px; background: var(--sheet); }
 .review-sheet { position: relative; max-width: 960px; margin: 56px auto 0; padding: clamp(32px, 7vw, 88px); background: var(--sheet); box-shadow: 0 18px 60px var(--shadow); clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 0 100%); animation: press .22s ease both; }
 .specimen-tab { display: inline-block; margin-bottom: 32px; padding: 6px 10px; border: 1px solid var(--ink-soft); font-size: .76rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .review-sheet blockquote { margin: 0 0 32px; font-size: clamp(1.65rem, 4vw, 3.25rem); line-height: 1.35; }
