@@ -11,7 +11,7 @@ for (const route of ['/', '/demo', '/library', '/review', '/privacy', '/terms', 
     await expect(page.locator('main')).toHaveCount(1);
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page).toHaveTitle(/Reading Margin Recall/);
-    const results = await new AxeBuilder({ page }).analyze();
+    const results = await new AxeBuilder({ page: page as never }).analyze();
     expect(results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
     expect(errors).toEqual([]);
   });
@@ -68,6 +68,6 @@ test('dark treatment has no serious accessibility violations', async ({ page }) 
   await page.goto('/');
   await page.evaluate(() => localStorage.setItem('rmr:theme', 'dark'));
   await page.reload();
-  const results = await new AxeBuilder({ page }).analyze();
+  const results = await new AxeBuilder({ page: page as never }).analyze();
   expect(results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
 });

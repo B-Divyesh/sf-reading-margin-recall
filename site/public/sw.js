@@ -16,7 +16,7 @@ self.addEventListener('activate', (event) => event.waitUntil(caches.keys().then(
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET' || new URL(event.request.url).origin !== location.origin) return;
   event.respondWith((async () => {
-    const cached = await caches.match(event.request);
+    const cached = await caches.match(event.request, { ignoreVary: true });
     if (cached) return cached;
     try {
       const response = await fetch(event.request);
@@ -24,7 +24,7 @@ self.addEventListener('fetch', (event) => {
       await cache.put(event.request, response.clone());
       return response;
     } catch {
-      return event.request.mode === 'navigate' ? (await caches.match('/')) || Response.error() : Response.error();
+      return event.request.mode === 'navigate' ? (await caches.match('/', { ignoreVary: true })) || Response.error() : Response.error();
     }
   })());
 });
