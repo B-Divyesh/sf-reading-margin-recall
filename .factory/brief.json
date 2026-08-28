@@ -1,0 +1,10 @@
+{
+  "slug": "reading-margin-recall",
+  "title": "Reading Margin Recall",
+  "summary": "Turn selected passages into private, source-linked review notes.",
+  "artifact_class": "browser-extension",
+  "user": "Language learners reading their own ebooks or web articles who need to turn selected passages into reviewable, source-linked notes.",
+  "smallest_useful_product": "Browser extension plus local PWA: highlight a sentence, add the user's gloss, choose a deletion, and review with a link back to the original page.",
+  "monetization": "one-time",
+  "constraints": "Capture only user-selected text; do not fetch, republish, or bypass access controls for source content; keep data local."
+}

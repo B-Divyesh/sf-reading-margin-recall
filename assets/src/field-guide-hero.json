@@ -1,0 +1,6 @@
+{
+  "generated": "2026-08-28",
+  "tool": "/opt/fleet/lib/gen-image.sh",
+  "deployment": "factory-image",
+  "prompt": "Use case: stylized-concept. Asset type: website hero and social artwork. Primary request: an editorial botanical field-guide illustration that connects a selected reading passage to a later memory review. Scene: an open naturalist notebook on a quiet reading desk with a pressed fern, a narrow blank paper sentence strip, pencilled marginal gloss marks, and a single amber deletion bracket. Style: refined hand-painted gouache and graphite on fibrous paper, realistic material texture, not photorealistic. Composition: 3:2 wide landscape, notebook anchored right of center, generous calm negative space around the edges, no important details at the crop boundary. Lighting: soft north-window daylight, restrained shadows. Palette: herbarium cream, deep forest green, dried fern, muted amber. Constraints: no readable text, no people, no hands, no UI screenshot, no logos, no watermark, no gradient, no neon."
+}
