@@ -85,7 +85,6 @@ blockquote { margin-inline: 0; font-family: var(--display); }
 .theme-button { width: 44px; padding: 0; border: 1px solid var(--ink-soft); border-radius: 50%; background: transparent; font-size: 1.3rem; }
 .demo-banner { position: relative; z-index: 40; display: flex; justify-content: center; align-items: center; gap: 24px; min-height: 48px; padding: 6px 20px; background: var(--pollen); color: #18261f; font-size: .9rem; }
 .demo-banner div { display: flex; gap: 8px; }
-.license-notice { padding: 10px 20px; background: var(--paper-deep); color: var(--ink); text-align: center; font-size: .88rem; }
 
 main { overflow: clip; }
 .section-pad { max-width: 1440px; margin-inline: auto; padding: clamp(64px, 9vw, 120px) clamp(20px, 5vw, 72px); }
@@ -94,7 +93,7 @@ main { overflow: clip; }
 .hero-copy { position: relative; z-index: 2; }
 .hero-copy::before { content: 'No. 01'; position: absolute; top: -48px; left: 0; padding-bottom: 4px; border-bottom: 2px solid var(--pollen); font: 700 .72rem var(--body); letter-spacing: .12em; }
 .lede { max-width: 48ch; margin: 24px 0; font-size: clamp(1.08rem, 2vw, 1.28rem); color: var(--ink-soft); }
-.hero-actions, .paid-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 10px 20px; border: 1px solid var(--fern-dark); border-radius: 3px 16px 3px 3px; font-weight: 800; text-align: center; text-decoration: none; }
 .button:active { transform: translateY(2px); }
 .primary { background: var(--fern-dark); color: var(--paper); }
@@ -134,17 +133,12 @@ mark { padding: 0 .12em; background: color-mix(in srgb, var(--pollen) 35%, trans
 .boundaries a { color: var(--paper); }
 .boundaries ul { margin: 0; padding: 0; list-style: none; }
 .boundaries li { padding: 14px 0; border-bottom: 1px solid color-mix(in srgb, var(--paper) 32%, transparent); font-family: var(--display); font-size: 1.18rem; }
-.paid { display: grid; grid-template-columns: .35fr 1fr; gap: clamp(40px, 8vw, 112px); }
-.price-stamp { place-self: start; display: grid; place-items: center; width: 180px; height: 180px; border: 2px solid var(--pollen); border-radius: 50%; transform: rotate(-4deg); }
-.price-stamp strong { display: block; font: 500 3rem var(--display); line-height: 1; }
-.price-stamp span { display: block; font-size: .72rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
-.paid h2 { max-width: 14ch; }
-.paid ul { padding-left: 20px; }
-.legal-line { font-size: .82rem; color: var(--ink-soft); }
-.license-form { max-width: 580px; margin-top: 24px; padding: 20px; border: 1px solid var(--ink-soft); }
-.license-form > div { display: flex; gap: 8px; }
-.license-form input { min-width: 0; flex: 1; padding: 8px 12px; background: var(--sheet); border: 1px solid var(--ink-soft); }
-.hidden { display: none; }
+.included { display: grid; grid-template-columns: .35fr 1fr; gap: clamp(40px, 8vw, 112px); }
+.included-stamp { place-self: start; display: grid; place-items: center; width: 180px; height: 180px; border: 2px solid var(--pollen); border-radius: 50%; transform: rotate(-4deg); }
+.included-stamp strong { display: block; font: 500 3rem var(--display); line-height: 1; }
+.included-stamp span { display: block; font-size: .72rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+.included h2 { max-width: 14ch; }
+.included ul { padding-left: 20px; }
 
 .app-intro { padding-bottom: 48px; border-bottom: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); }
 .app-intro h1 { max-width: 14ch; font-size: clamp(2.6rem, 7vw, 5rem); }
@@ -153,7 +147,7 @@ mark { padding: 0 .12em; background: color-mix(in srgb, var(--pollen) 35%, trans
 .capture-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; max-width: 920px; padding: clamp(24px, 5vw, 48px); background: var(--sheet); box-shadow: 0 12px 36px var(--shadow); }
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field.wide { grid-column: 1 / -1; }
-.field label, .license-form label { font-size: .84rem; font-weight: 800; }
+.field label { font-size: .84rem; font-weight: 800; }
 .field small { color: var(--ink-soft); }
 .field input, .field textarea, .field select { width: 100%; padding: 10px 12px; border: 1px solid var(--ink-soft); border-radius: 2px; background: var(--paper); }
 .capture-form .button { justify-self: start; }
@@ -200,6 +194,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--ink-soft); border-radius: 3px; f
 .reveal { margin: 24px 0 32px; }
 .reveal kbd { margin-left: 10px; border-color: color-mix(in srgb, var(--paper) 60%, transparent); }
 .source-return { display: block; width: fit-content; margin-top: 32px; }
+.unavailable-source { display: inline-block; color: var(--ink-soft); font-style: italic; }
 .keyboard-note { margin: 24px auto 0; font-size: .86rem; color: var(--ink-soft); text-align: center; }
 .legal { max-width: 860px; }
 .legal h1 { max-width: 14ch; margin-bottom: 56px; font-size: clamp(2.7rem, 7vw, 5rem); }
@@ -222,11 +217,11 @@ footer .build { grid-column: 1 / -1; color: var(--ink-soft); }
   .site-header nav { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; gap: 12px; overflow-x: auto; }
   .hero { grid-template-columns: 1fr; }
   .hero-art { max-width: 680px; }
-  .preview, .workbench, .paid { grid-template-columns: 1fr; }
+  .preview, .workbench, .included { grid-template-columns: 1fr; }
   .margin-label { width: max-content; }
   .steps ol { grid-template-columns: 1fr; gap: 40px; }
   .boundaries { grid-template-columns: 1fr; }
-  .price-stamp { width: 140px; height: 140px; }
+  .included-stamp { width: 140px; height: 140px; }
   .note-grid { grid-template-columns: 1fr; }
   footer { grid-template-columns: 1fr; }
   footer .build { grid-column: auto; }
@@ -244,7 +239,6 @@ footer .build { grid-column: 1 / -1; color: var(--ink-soft); }
   .note-card { padding: 24px; }
   .grade-field > div { grid-template-columns: repeat(2, 1fr); }
   .empty-state { padding: 28px; }
-  .license-form > div { align-items: stretch; flex-direction: column; }
   .lost-leaf { display: none; }
 }
 

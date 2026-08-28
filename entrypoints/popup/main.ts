@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import { clozePassage, gradeNote, type ReadingNote, type RecallGrade } from '../../shared/model';
+import { clozePassage, gradeNote, isHttpUrl, type ReadingNote, type RecallGrade } from '../../shared/model';
 
 const main = document.querySelector<HTMLElement>('#main')!;
 let notes: ReadingNote[] = [];
@@ -22,7 +22,10 @@ function render() {
   main.innerHTML = `<p class="eyebrow">${notes.length} saved · ${note.reviews} reviews</p><h1>Recall the missing word</h1><article><p class="source">${esc(note.sourceTitle)}</p><blockquote>${esc(revealed ? note.passage : clozePassage(note))}</blockquote><p class="gloss-label">Your gloss</p><p class="gloss">${esc(note.gloss)}</p>${revealed ? `<p class="answer">Hidden word: <strong>${esc(note.deletion)}</strong></p><fieldset><legend>How well did you recall it?</legend><div class="grades"><button data-grade="1"><kbd>1</kbd> Again</button><button data-grade="2"><kbd>2</kbd> Hard</button><button data-grade="3"><kbd>3</kbd> Good</button><button data-grade="4"><kbd>4</kbd> Easy</button></div></fieldset>` : `<button id="reveal" class="primary">Reveal answer <kbd>Space</kbd></button>`}<button id="source" class="source-link">Open original page ↗</button></article><div class="footer-actions"><button id="open-site" class="secondary">Open the separate web app</button><button id="delete" class="danger">Delete note</button></div>`;
   document.querySelector('#reveal')?.addEventListener('click', () => { revealed = true; render(); });
   document.querySelectorAll<HTMLButtonElement>('[data-grade]').forEach((button) => button.addEventListener('click', () => applyGrade(note.id, Number(button.dataset.grade) as RecallGrade)));
-  document.querySelector('#source')?.addEventListener('click', () => browser.tabs.create({ url: note.sourceUrl }));
+  document.querySelector('#source')?.addEventListener('click', () => {
+    if (isHttpUrl(note.sourceUrl)) void browser.tabs.create({ url: note.sourceUrl });
+    else document.querySelector('#live')!.textContent = 'This note has no usable web source link.';
+  });
   document.querySelector('#open-site')?.addEventListener('click', () => browser.tabs.create({ url: 'https://reading-margin-recall.sociobot.in/library' }));
   document.querySelector('#delete')?.addEventListener('click', async () => { if (confirm(`Delete the note from “${note.sourceTitle}”?`)) { notes = notes.filter((item) => item.id !== note.id); await save(); render(); } });
 }

@@ -48,15 +48,15 @@ npm run build
 
 - Space reveals a review answer. Keys 1–4 grade recall.
 - JSON export includes every note. JSON import restores a backup.
-- Source links always point to the address saved during capture.
-- The free core includes capture, review, source links, and backup.
-- Study Edition costs $12 once and adds focused review views. Checkout and license verification use only the Sociobot billing API.
+- Source links accept only `http:` and `https:` addresses.
+- Every tool is free to use. No account or subscription is required.
+- Difficult-note and source filters are available in every review.
 
 No automatic translation, OCR, book catalog, sync account, or content scraping is included.
 
 ## Privacy and terms
 
-The site includes `/privacy` and `/terms`. License tokens are stored under `sb_license:reading-margin-recall`. A token is sent only when the user restores or verifies a purchase.
+The site includes `/privacy` and `/terms`. Reading notes and settings stay in browser storage.
 
 ## Repository map
 

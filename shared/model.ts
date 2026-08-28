@@ -14,6 +14,20 @@ export interface ReadingNote {
   lastGrade?: RecallGrade;
 }
 
+/**
+ * Source links are opened from both the web app and the extension. Keep the
+ * accepted schemes deliberately narrow so a saved/imported note cannot become
+ * an executable or otherwise unusable browser URL.
+ */
+export function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' || url.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
 export function makeNote(input: Pick<ReadingNote, 'passage' | 'gloss' | 'deletion' | 'sourceUrl' | 'sourceTitle'>): ReadingNote {
   const now = new Date();
   return {
