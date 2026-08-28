@@ -1,0 +1,13 @@
+{
+  "name": "Reading Margin Recall",
+  "short_name": "Margin Recall",
+  "description": "Save selected passages with a gloss and review missing words.",
+  "start_url": "/library",
+  "display": "standalone",
+  "background_color": "#f4f0e4",
+  "theme_color": "#18362b",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://reading-margin-recall.sociobot.in/sitemap.xml

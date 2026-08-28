@@ -1,0 +1,29 @@
+:root { font-family: ui-sans-serif, system-ui, sans-serif; color: #18362b; background: #f4f0e4; font-size: 16px; }
+* { box-sizing: border-box; }
+body { width: 380px; min-height: 520px; margin: 0; background: radial-gradient(circle at 1px 1px, rgba(24,54,43,.08) 1px, transparent 0) 0 0 / 18px 18px, #f4f0e4; }
+header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #9aa69f; font-family: Georgia, serif; font-weight: 700; }
+header p { margin: 0; line-height: 1.05; } header em { color: #2e6049; font-weight: 400; }
+.mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: #18362b; color: #f4f0e4; font-size: 24px; }
+main { padding: 22px 18px; }
+h1 { margin: 0 0 20px; font: 500 30px/1.08 Georgia, serif; letter-spacing: -.02em; }
+.eyebrow, .source, .gloss-label { margin: 0 0 8px; color: #50635a; font-size: 11px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+article { padding: 20px; background: #fbf8ef; border: 1px solid #a8afa9; border-radius: 2px 20px 2px 2px; box-shadow: 4px 5px 0 #e7dfc9; }
+blockquote { margin: 18px 0; font: 21px/1.42 Georgia, serif; }
+.gloss { color: #50635a; }
+.answer { padding: 10px; border-left: 4px solid #d79a2b; background: #e7dfc9; }
+button { min-height: 44px; font: 700 14px ui-sans-serif, system-ui, sans-serif; cursor: pointer; }
+button:focus-visible { outline: 3px solid #b56f00; outline-offset: 2px; }
+.primary, .secondary { padding: 8px 13px; border: 1px solid #173f31; border-radius: 2px 12px 2px 2px; }
+.primary { width: 100%; margin-top: 16px; background: #173f31; color: #f4f0e4; }
+.secondary { background: transparent; color: #173f31; }
+.source-link, .danger { min-height: 44px; padding: 8px 0; border: 0; background: transparent; text-decoration: underline; text-underline-offset: 3px; color: #173f31; }
+.danger { color: #913641; }
+fieldset { margin: 18px 0 0; padding: 0; border: 0; } legend { margin-bottom: 8px; font-weight: 800; }
+.grades { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.grades button { border: 1px solid #2e6049; background: transparent; color: #18362b; }
+kbd { padding: 2px 4px; border: 1px solid currentColor; border-radius: 2px; font: 11px ui-monospace, monospace; }
+.footer-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 18px; }
+.empty { margin-bottom: 20px; padding: 24px; border: 1px dashed #50635a; background: rgba(251,248,239,.7); }
+.empty span { display: block; color: #2e6049; font: 52px Georgia, serif; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
