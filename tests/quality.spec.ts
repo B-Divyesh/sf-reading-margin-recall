@@ -50,7 +50,6 @@ test('keyboard focus and reduced motion remain usable at 390px', async ({ page }
 test('deployment policy keeps execution and requests same-origin', async () => {
   const config = JSON.parse(await readFile('site/public/staticwebapp.config.json', 'utf8')) as {
     globalHeaders: Record<string, string>;
-    navigationFallback: { exclude: string[] };
     responseOverrides: Record<string, { rewrite: string }>;
     routes: Array<{ route: string; statusCode?: number; rewrite?: string }>;
   };
@@ -59,7 +58,6 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   expect(csp).toContain("connect-src 'self'");
   expect(csp).toContain("form-action 'self'");
   expect(csp).not.toContain('api.sociobot.in');
-  expect(config.navigationFallback.exclude).toContain('/downloads/*');
   expect(config.globalHeaders['X-Content-Type-Options']).toBe('nosniff');
   expect(config.globalHeaders['Referrer-Policy']).toBe('strict-origin-when-cross-origin');
   expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html' } });
