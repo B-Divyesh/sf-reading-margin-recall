@@ -34,7 +34,8 @@ check(liveZip.length > 10_000 && liveZip.subarray(0, 2).toString() === 'PK', 'Ex
 check(sha256(liveZip) === sha256(localZip), 'Live extension ZIP does not match the local production build.');
 
 const missingPath = `/release-check-not-found-${Date.now()}`;
-const missingResponse = await fetch(new URL(missingPath, base), { cache: 'no-store' });
+const missingUrl = new URL(missingPath, base).href;
+const missingResponse = await fetch(missingUrl, { cache: 'no-store' });
 const missingHtml = await missingResponse.text();
 check(missingResponse.status === 404, `Unknown route returned ${missingResponse.status}, not 404.`);
 check(missingHtml.includes('<title>Page not found — Reading Margin Recall</title>'), 'Unknown route did not return the product 404 title.');
@@ -50,17 +51,19 @@ check(notFoundCache.includes('no-store') || (notFoundCache.includes('must-revali
 
 const browser = await chromium.launch({ channel: 'chromium' });
 try {
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
   const crossOrigin = [];
   const errors = [];
   page.on('request', (request) => {
     if (new URL(request.url()).origin !== base.origin) crossOrigin.push(request.url());
   });
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    const isExpectedDocument404 = message.location().url === missingUrl && message.text().includes('status of 404');
+    if (message.type() === 'error' && !isExpectedDocument404) errors.push(message.text());
   });
   page.on('pageerror', (error) => errors.push(error.message));
-  const response = await page.goto(new URL(missingPath, base).href, { waitUntil: 'networkidle' });
+  const response = await page.goto(missingUrl, { waitUntil: 'networkidle' });
   check(response?.status() === 404, `Browser unknown-route response was ${response?.status()}.`);
   check(await page.title() === 'Page not found — Reading Margin Recall', 'Browser received the wrong 404 document.');
   const results = await new AxeBuilder({ page }).analyze();
@@ -68,6 +71,7 @@ try {
   check(severe.length === 0, `The live 404 has Axe violations: ${severe.map((item) => item.id).join(', ')}.`);
   check(crossOrigin.length === 0, `The live 404 made third-party requests: ${crossOrigin.join(', ')}.`);
   check(errors.length === 0, `The live 404 logged errors: ${errors.join(', ')}.`);
+  await context.close();
 } finally {
   await browser.close();
 }

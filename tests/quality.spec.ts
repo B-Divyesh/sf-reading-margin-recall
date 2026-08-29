@@ -51,9 +51,12 @@ test('@regression:demo-exit discards edited demo storage through ordinary naviga
 
 test('@regression:built-404 is product-owned, accessible, and same-origin', async ({ page }) => {
   const crossOrigin: string[] = [];
+  const errors: string[] = [];
   page.on('request', (request) => {
     if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOrigin.push(request.url());
   });
+  page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/404.html');
   await expect(page).toHaveTitle('Page not found — Reading Margin Recall');
   await expect(page.getByRole('heading', { level: 1, name: 'We could not find this page' })).toBeVisible();
@@ -61,6 +64,7 @@ test('@regression:built-404 is product-owned, accessible, and same-origin', asyn
   const results = await new AxeBuilder({ page: page as never }).analyze();
   expect(results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
   expect(crossOrigin).toEqual([]);
+  expect(errors).toEqual([]);
 });
 
 test('keyboard focus and reduced motion remain usable at 390px', async ({ page }) => {
