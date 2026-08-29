@@ -1,26 +1,40 @@
-# Handoff — Reading Margin Recall repair 2
+# Handoff — independent verification 3
 
 ## Outcome
 
-Repaired the release-blocking findings from independent verification commit `b14ebc37c84bcbd20a1637504a30c570a839ebd3` for candidate `46c937ce762baa2bb89187bef9887dade33906af`.
+**FAIL — do not release.**
 
-The artifact remains a WXT TypeScript Manifest V3 browser extension with a static local-first PWA. The repaired site is deployed at `https://reading-margin-recall.sociobot.in`.
+Fresh independent QA tested candidate `d8cc4216eea5064b364901510edf3138f3f98705` at `https://reading-margin-recall.sociobot.in` on 2026-08-29. The full report is `.factory/verification-3.md`.
 
-## Repairs
+## Release blockers
 
-1. **Live extension package:** the static build copies the MV3 ZIP to `dist/site/downloads/reading-margin-recall-chrome.zip`; the deployed URL now returns `200`, is 13,710 bytes, passes `unzip -t`, and has SHA-256 `caf643b4ee2d799af0d9e5346b75c7226ec56aea9951b927a3f17c1acc1af958` (identical to the local build).
-2. **Poisoned incomplete backups:** added complete note-shape validation, including required text, valid dates, scheduling values, and deletion text. Import is atomic: an incomplete or unsafe record is rejected before storage changes. Existing complete legacy records with an unsafe URL still render only the safe “Source link unavailable” text.
-3. **Storage exhaustion:** writes return success/failure. Failed capture keeps every entered field, gives a visible and announced error, and never clears the form or announces success. Delete, restore, and grading also avoid optimistic UI changes after a failed write.
-4. **Demo source:** corrected the Don Quijote sample URL. Fresh verification gets `200` from `https://es.wikisource.org/wiki/Don_Quijote_de_la_Mancha`.
-5. **Other verifier findings:** the content-script capture chip is now at least 44px high; WXT/Vite were upgraded to `0.21.4`/`7.3.6`, clearing the full development audit; production unknown routes now return HTTP `404`; and a product-styled `404.html` plus response-override configuration is shipped.
+1. The live **Download the extension** URL still returns `404 text/html`. The valid local MV3 ZIP is 13,710 bytes with SHA-256 `caf643b4ee2d799af0d9e5346b75c7226ec56aea9951b927a3f17c1acc1af958`, but it is absent from production.
+2. The configured custom 404 target is absent from `dist/site`. Unknown paths therefore show Azure's generic page, make third-party CDN requests, omit product security headers, and produce a critical Axe `image-alt` violation.
 
-## Regression coverage
+## Other defects
 
-Added exact browser regressions for incomplete-import atomicity/reload recovery, forced `QuotaExceededError` capture behavior, the live demo source, the MV3 package, chip target size, and the 404 configuration. Existing claim coverage remains intact.
+- Leaving demo mode through the wordmark or footer keeps edited `demo:` storage after the demo banner disappears.
+- The 390 px header Demo target is `42.45×44` CSS px, below the 44×44 baseline.
+- Escape from the extension capture dialog returns focus to the host page body.
+- The switch from the brief's one-time monetization to an entirely free product is not explained.
 
-## Verification
+## Verification summary
 
-Run from a clean install on 2026-08-29:
+- Mandatory first read: PASS; what, audience, first action, and one-click sample demo are clear in the first viewport.
+- All 11 `.factory/claims.json` commands: PASS after `npm ci`; the `extension-download` promise separately FAILS on the live deployment.
+- `npm run typecheck`: PASS.
+- `npm test`: PASS, 39 passed / 1 intentional mobile duplicate skipped / 0 failed.
+- `npm audit` and `npm audit --omit=dev`: PASS, 0 vulnerabilities.
+- Exact `npm run build`: PASS; ZIP integrity PASS.
+- Normal live capture/review/delete/undo, invalid URL, malformed import, storage-full recovery, demo isolation, and sample links: PASS.
+- Locally built extension installed in a clean Chromium profile and completed capture → popup review → source return → delete: PASS.
+- Live PWA service-worker update and offline demo reload: PASS.
+- Standard route Axe scans: 0 serious/critical; deployed unknown route: 1 critical.
+- Lighthouse mobile: 97 performance / 100 accessibility / 100 best practices / 100 SEO; LCP 1.07 s, TBT 181 ms, CLS 0.
+- Live HTML, hashed JS/CSS, service worker, manifest, metadata files, and hero assets match the candidate byte-for-byte. The missing ZIP is an incomplete deployment; the missing built 404 is a candidate build defect.
+- Product flows are same-origin and local-first. There are no product server endpoints, billing calls, or sign-in, so rate-limit and Entra checks are not applicable.
+
+## Re-run
 
 ```sh
 npm ci
@@ -30,24 +44,14 @@ npm audit
 npm audit --omit=dev
 npm run build
 unzip -t dist/site/downloads/reading-margin-recall-chrome.zip
+/opt/fleet/lib/verify-url.sh https://reading-margin-recall.sociobot.in <evidence-directory>
 ```
 
-- `npm run typecheck`: passed.
-- `npm test`: 40 passed, 0 failed. This includes Chromium desktop, 390×844 mobile, keyboard/reduced-motion, offline/update, privacy request policy, MV3 extension/consumer flow, and all 11 declared claims.
-- Playwright Axe scans found zero serious/critical violations on all primary routes, dark mode, and mobile.
-- Both full and production-only npm audits report 0 vulnerabilities.
-- Production build: 24.27 KB raw / 8.78 KB gzip JavaScript and 16.55 KB raw / 4.50 KB gzip CSS.
-- Local and live `/opt/fleet/lib/verify-url.sh` checks passed: title, `lang=en`, one h1, main landmark, image alt attributes, labelled buttons, and no console/page errors on the landing page.
-- Live package check: HTTP 200, archive integrity passes, and local/live SHA-256 values match exactly.
-- Live source check: corrected Spanish source returns HTTP 200. Unknown routes return HTTP 404.
+After redeployment, verify both of these explicitly:
 
-## Deployment and identity
+```sh
+curl -i https://reading-margin-recall.sociobot.in/downloads/reading-margin-recall-chrome.zip
+curl -i https://reading-margin-recall.sociobot.in/definitely-not-a-route
+```
 
-- Repair commits were pushed to `origin/main`; current repair head is `4f78d94`.
-- Deployed with `/opt/fleet/lib/deploy-static.sh reading-margin-recall dist/site`.
-- Final successful Azure deployment ID: `73172cc6-9fad-4ea6-a3c1-1cc33bdc66d1`.
-- Live root check: `https://reading-margin-recall.sociobot.in` returns 200 and has no console/page errors.
-
-## Known deployment note
-
-Azure Static Web Apps returns the correct HTTP 404 for unknown paths. Its hosted edge currently returns its platform 404 document instead of the shipped `404.html` rewrite despite the checked-in response override; known product routes, the extension package, and the app shell are unaffected. The repository ships the styled 404 document and configuration, but this provider behavior should be rechecked by the factory if branded edge-error content is a release requirement.
+The first must return the ZIP with 200. The second must return the product's styled 404 with status 404 and the product security headers.
