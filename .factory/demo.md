@@ -7,3 +7,4 @@ The demo starts with three source-linked notes in French, German, and Spanish. E
 Demo notes use `localStorage` key `demo:rmr:notes`. Demo theme settings use `demo:rmr:theme`. Real notes use `rmr:notes`; no demo action reads or writes that key.
 
 Choose **Reset demo** to restore the three bundled notes. Choose **Start for real** to delete every `demo:` key and open the real notes screen. Demo notes are never copied into real storage.
+Following the home link, footer Privacy link, or another non-demo link also deletes every `demo:` key. Demo pages keep the `?demo=1` marker when moving between notes, review, and privacy.

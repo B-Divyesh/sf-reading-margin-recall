@@ -22,6 +22,45 @@ test('mobile layout stays within 390px', async ({ page }) => {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
   await expect(page.getByRole('link', { name: 'Try it with sample data' })).toBeVisible();
+  const demoTarget = await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Demo' }).boundingBox();
+  expect(demoTarget?.width).toBeGreaterThanOrEqual(44);
+  expect(demoTarget?.height).toBeGreaterThanOrEqual(44);
+});
+
+test('@regression:demo-exit discards edited demo storage through ordinary navigation', async ({ page }) => {
+  const addDemoEdit = async () => page.evaluate(() => {
+    const notes = JSON.parse(localStorage.getItem('demo:rmr:notes') ?? '[]');
+    notes.push({ ...notes[0], id: `edited-${notes.length}` });
+    localStorage.setItem('demo:rmr:notes', JSON.stringify(notes));
+    localStorage.setItem('demo:rmr:theme', 'dark');
+  });
+
+  await page.goto('/demo');
+  await addDemoEdit();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('demo:rmr:notes') ?? '[]').length)).toBe(4);
+  await page.locator('footer').getByRole('link', { name: 'Privacy' }).click();
+  await expect(page).toHaveURL('/privacy');
+  expect(await page.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith('demo:')))).toEqual([]);
+
+  await page.goto('/demo');
+  await addDemoEdit();
+  await page.getByRole('link', { name: 'Reading Margin Recall home' }).click();
+  await expect(page).toHaveURL('/');
+  expect(await page.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith('demo:')))).toEqual([]);
+});
+
+test('@regression:built-404 is product-owned, accessible, and same-origin', async ({ page }) => {
+  const crossOrigin: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOrigin.push(request.url());
+  });
+  await page.goto('/404.html');
+  await expect(page).toHaveTitle('Page not found — Reading Margin Recall');
+  await expect(page.getByRole('heading', { level: 1, name: 'We could not find this page' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Return home' })).toHaveAttribute('href', '/');
+  const results = await new AxeBuilder({ page: page as never }).analyze();
+  expect(results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
+  expect(crossOrigin).toEqual([]);
 });
 
 test('keyboard focus and reduced motion remain usable at 390px', async ({ page }) => {
@@ -50,8 +89,9 @@ test('keyboard focus and reduced motion remain usable at 390px', async ({ page }
 test('deployment policy keeps execution and requests same-origin', async () => {
   const config = JSON.parse(await readFile('site/public/staticwebapp.config.json', 'utf8')) as {
     globalHeaders: Record<string, string>;
-    responseOverrides: Record<string, { rewrite: string; statusCode: number }>;
-    routes: Array<{ route: string; statusCode?: number; rewrite?: string }>;
+    mimeTypes: Record<string, string>;
+    responseOverrides: Record<string, { rewrite: string }>;
+    routes: Array<{ route: string; statusCode?: number; rewrite?: string; headers?: Record<string, string> }>;
   };
   const csp = config.globalHeaders['Content-Security-Policy'];
   expect(csp).toContain("default-src 'self'");
@@ -60,10 +100,17 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   expect(csp).not.toContain('api.sociobot.in');
   expect(config.globalHeaders['X-Content-Type-Options']).toBe('nosniff');
   expect(config.globalHeaders['Referrer-Policy']).toBe('strict-origin-when-cross-origin');
-  expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html', statusCode: 404 } });
+  expect(config.globalHeaders['Strict-Transport-Security']).toContain('max-age=31536000');
+  expect(config.mimeTypes['.zip']).toBe('application/zip');
+  expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html' } });
   expect(config.routes).toContainEqual({ route: '/', rewrite: '/index.html' });
+  expect(config.routes).toContainEqual({ route: '/404.html', headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
   await access('site/404.html');
   await access('site/public/404.css');
+  await access('dist/site/404.html');
+  const built404 = await readFile('dist/site/404.html', 'utf8');
+  expect(built404).toContain('<h1>We could not find this page</h1>');
+  expect(built404).not.toMatch(/https?:\/\//);
 });
 
 test('extension build is packaged as MV3', async () => {
@@ -97,6 +144,12 @@ test('@claim:extension-selection captures only selected page text', async ({}, t
     expect((await root.locator('.capture-chip').boundingBox())?.height).toBeGreaterThanOrEqual(44);
     await root.locator('.capture-chip').click();
     await expect(root.locator('#rmr-passage')).toHaveText('For language learners who want selected sentences to become source-linked review notes.');
+    await expect(root.locator('#rmr-gloss')).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(root.locator('dialog')).not.toBeVisible();
+    await expect(root.locator('.capture-chip')).toBeVisible();
+    await expect(root.locator('.capture-chip')).toBeFocused();
+    await root.locator('.capture-chip').click();
     await root.locator('#rmr-gloss').fill('A short explanation in my words.');
     await root.locator('#rmr-deletion').selectOption({ index: 1 });
     await root.locator('#rmr-save').click();

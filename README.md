@@ -40,9 +40,11 @@ npm run dev:extension   # WXT extension development
 npm run typecheck
 npm test
 npm run build
+npm run verify:live     # after deployment; checks build identity, ZIP, and branded HTTP 404
 ```
 
 `npm run build` builds the WXT extension, packages its zip, and writes the static deployment to `dist/site`. Deploy that directory as the site root.
+`npm run verify:live` compares the deployed script, stylesheet, and extension ZIP with that build. It also checks the live HTTP 404, product headers, request privacy, and Axe results.
 
 ## Product behavior
 

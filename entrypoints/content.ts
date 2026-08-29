@@ -41,6 +41,7 @@ export default defineContentScript({
     const chip = document.createElement('button');
     chip.type = 'button'; chip.className = 'capture-chip'; chip.textContent = 'Save passage';
     const dialog = document.createElement('dialog');
+    let restoreCaptureAction = false;
     dialog.setAttribute('aria-labelledby', 'rmr-title');
     dialog.innerHTML = `<form method="dialog"><h2 id="rmr-title">Save this passage</h2><p class="hint">Add your meaning, then choose one word to recall.</p><blockquote id="rmr-passage"></blockquote><label for="rmr-gloss">Your gloss</label><textarea id="rmr-gloss" required></textarea><label for="rmr-deletion">Word to hide</label><select id="rmr-deletion" required><option value="">Choose a word</option></select><p id="rmr-error" class="error" role="alert"></p><div class="actions"><button class="secondary" value="cancel">Cancel</button><button id="rmr-save" class="primary" value="default">Save review note</button></div></form><div class="success" role="status"><strong>Passage saved</strong><span>Open the extension to review it.</span></div>`;
     shadow.append(style, chip, dialog);
@@ -62,6 +63,7 @@ export default defineContentScript({
 
     chip.addEventListener('click', () => {
       hideChip();
+      restoreCaptureAction = true;
       dialog.querySelector<HTMLElement>('#rmr-passage')!.textContent = selectedText;
       const select = dialog.querySelector<HTMLSelectElement>('#rmr-deletion')!;
       select.replaceChildren(new Option('Choose a word', ''), ...deletionChoices(selectedText).map((word) => new Option(word, word)));
@@ -70,6 +72,12 @@ export default defineContentScript({
       dialog.querySelector<HTMLFormElement>('form')!.style.display = 'block';
       dialog.showModal();
       requestAnimationFrame(() => dialog.querySelector<HTMLTextAreaElement>('#rmr-gloss')!.focus());
+    });
+
+    dialog.addEventListener('close', () => {
+      if (!restoreCaptureAction) return;
+      chip.classList.add('visible');
+      chip.focus();
     });
 
     dialog.querySelector<HTMLButtonElement>('#rmr-save')!.addEventListener('click', async (event) => {
@@ -83,6 +91,7 @@ export default defineContentScript({
         const notes = Array.isArray(stored['rmr:notes']) ? stored['rmr:notes'] as ReadingNote[] : [];
         notes.unshift(makeNote({ passage: selectedText, gloss, deletion, sourceUrl: location.href, sourceTitle: document.title || location.hostname }));
         await browser.storage.local.set({ 'rmr:notes': notes });
+        restoreCaptureAction = false;
         dialog.querySelector<HTMLFormElement>('form')!.style.display = 'none';
         dialog.querySelector<HTMLElement>('.success')!.style.display = 'block';
         setTimeout(() => dialog.close(), 1200);

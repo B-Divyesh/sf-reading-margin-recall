@@ -87,6 +87,7 @@ test('@claim:free-tools @regression:no-dead-billing gives every tool without a l
 test('@claim:extension-download @regression:production-download serves a valid MV3 package', async ({ request }) => {
   const response = await request.get('/downloads/reading-margin-recall-chrome.zip');
   expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('application/zip');
   expect((await response.body()).byteLength).toBeGreaterThan(10_000);
   const zipPath = 'dist/site/downloads/reading-margin-recall-chrome.zip';
   expect((await stat(zipPath)).size).toBeGreaterThan(10_000);

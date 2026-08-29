@@ -13,6 +13,10 @@ const e = (value: string) => value.replace(/[&<>'"]/g, (char) => ({ '&': '&amp;'
 const notesKey = () => demoMode ? 'demo:rmr:notes' : 'rmr:notes';
 const themeKey = () => demoMode ? 'demo:rmr:theme' : 'rmr:theme';
 
+function clearDemoStorage() {
+  Object.keys(localStorage).filter((key) => key.startsWith('demo:')).forEach((key) => localStorage.removeItem(key));
+}
+
 function readNotes(): ReadingNote[] {
   try {
     const raw = localStorage.getItem(notesKey());
@@ -133,7 +137,7 @@ function terms(): string {
 }
 
 function notFound(): string {
-  return shell(`<section class="not-found section-pad"><div class="lost-leaf" aria-hidden="true">⌁</div><p class="eyebrow">404 · loose leaf</p><h1>This page is not in the field guide</h1><p>The link may be old. Your saved notes have not changed.</p><a class="button primary nav-link" href="/">Return home</a></section>`);
+  return shell(`<section class="not-found section-pad"><div class="lost-leaf" aria-hidden="true">⌁</div><p class="eyebrow">Error 404</p><h1>We could not find this page</h1><p>The link may be old. Your saved notes have not changed.</p><a class="button primary nav-link" href="/">Return home</a></section>`);
 }
 
 function titleFor(path: string): string {
@@ -151,7 +155,9 @@ function render(moveFocus = false) {
 }
 
 function navigate(url: URL) {
-  demoMode = url.pathname === '/demo' || url.searchParams.get('demo') === '1';
+  const nextDemoMode = url.pathname === '/demo' || url.searchParams.get('demo') === '1';
+  if (demoMode && !nextDemoMode) clearDemoStorage();
+  demoMode = nextDemoMode;
   history.pushState({}, '', `${url.pathname}${url.search}`);
   revealAnswer = false;
   window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -173,6 +179,11 @@ function bindEvents() {
   document.querySelectorAll<HTMLAnchorElement>('a.nav-link').forEach((link) => link.addEventListener('click', (event) => {
     const url = new URL(link.href);
     if (url.origin === location.origin) { event.preventDefault(); navigate(url); }
+  }));
+  document.querySelectorAll<HTMLAnchorElement>('a:not(.nav-link)').forEach((link) => link.addEventListener('click', () => {
+    if (!demoMode) return;
+    const url = new URL(link.href);
+    if (url.origin !== location.origin || (url.pathname !== '/demo' && url.searchParams.get('demo') !== '1')) clearDemoStorage();
   }));
   document.querySelectorAll<HTMLElement>('[data-action]').forEach((control) => control.addEventListener('click', handleAction));
   document.querySelectorAll<HTMLButtonElement>('[data-delete]').forEach((button) => button.addEventListener('click', () => deleteNote(button.dataset.delete!)));
@@ -198,7 +209,7 @@ function handleAction(event: Event) {
   const target = event.currentTarget as HTMLElement;
   const action = target.dataset.action;
   if (action === 'reset-demo') { localStorage.removeItem('demo:rmr:notes'); revealAnswer = false; render(); announce('Demo reset to three sample notes.'); }
-  if (action === 'start-real') { Object.keys(localStorage).filter((key) => key.startsWith('demo:')).forEach((key) => localStorage.removeItem(key)); navigate(new URL('/library', location.origin)); }
+  if (action === 'start-real') { clearDemoStorage(); navigate(new URL('/library', location.origin)); }
   if (action === 'theme') {
     const current = localStorage.getItem(themeKey()) ?? 'auto';
     const next = current === 'auto' ? 'dark' : current === 'dark' ? 'light' : 'auto';
@@ -289,7 +300,12 @@ function setConnectionState() {
 }
 
 render(); setConnectionState();
-addEventListener('popstate', () => { demoMode = location.pathname === '/demo' || new URLSearchParams(location.search).get('demo') === '1'; render(true); });
+addEventListener('popstate', () => {
+  const nextDemoMode = location.pathname === '/demo' || new URLSearchParams(location.search).get('demo') === '1';
+  if (demoMode && !nextDemoMode) clearDemoStorage();
+  demoMode = nextDemoMode;
+  render(true);
+});
 addEventListener('online', setConnectionState); addEventListener('offline', setConnectionState);
 addEventListener('keydown', (event) => {
   const tag = (event.target as HTMLElement).tagName; if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;

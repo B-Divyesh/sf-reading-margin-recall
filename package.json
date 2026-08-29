@@ -11,6 +11,7 @@
     "build": "node scripts/build.mjs",
     "preview": "vite preview --config vite.config.ts --host 127.0.0.1",
     "test": "npm run build && playwright test",
+    "verify:live": "node scripts/verify-live.mjs",
     "typecheck": "wxt prepare && tsc --noEmit"
   },
   "devDependencies": {

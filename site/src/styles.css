@@ -80,7 +80,7 @@ blockquote { margin-inline: 0; font-family: var(--display); }
 .wordmark svg { width: 40px; height: 40px; padding: 5px; border-radius: 9px; background: var(--ink); fill: none; stroke: var(--paper); stroke-width: 3; stroke-linecap: round; }
 .wordmark svg circle { fill: var(--pollen); stroke: none; }
 .site-header nav { display: flex; gap: 28px; }
-.site-header nav a { min-height: 44px; display: inline-flex; align-items: center; font-size: .91rem; font-weight: 700; text-decoration: none; }
+.site-header nav a { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; font-size: .91rem; font-weight: 700; text-decoration: none; }
 .site-header nav a:hover { text-decoration: underline; text-underline-offset: .4em; }
 .theme-button { width: 44px; padding: 0; border: 1px solid var(--ink-soft); border-radius: 50%; background: transparent; font-size: 1.3rem; }
 .demo-banner { position: relative; z-index: 40; display: flex; justify-content: center; align-items: center; gap: 24px; min-height: 48px; padding: 6px 20px; background: var(--pollen); color: #18261f; font-size: .9rem; }
