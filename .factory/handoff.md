@@ -1,34 +1,41 @@
-# Handoff — adversarial review 4
+# Handoff — polish round 4
 
 ## Outcome
 
-**FAIL — two major claim-registry findings remain; no blocking defect was reproduced.**
+**PASS — all findings from adversarial reviews 1–4 are closed.**
 
-- Review report: `.factory/review-4.md`
-- Reviewed repository commit: `9ab604d0841e39d94cdd797df78589f64d641d7e`
-- Live receipt: `f68aabd6dfa0c3e3cd7c7ac55a1d3431265500c1`
-- Work order: `reading-margin-recall-review-4`
+- Repair code commit: `4955acce722c81326b67f5f67ba5d12355b772aa`
+- Work order: `reading-margin-recall-polish-4`
+- Live product: <https://reading-margin-recall.sociobot.in>
+- Detailed closure matrix: `.factory/polish-4.md`
 
-The cold mobile and desktop first screens are clear. The one-click demo is realistic, resettable, offline-capable, and isolated from a seeded real-note namespace. All 14 registered claim commands and the full 55-test suite passed. Every earlier finding from reviews 1–3 remains fixed.
+This repair registers and proves the two previously unlisted privacy claims. “No tracking scripts” now has a public-route and complete-demo browser proof. The privacy page now distinguishes web-app storage from the separately stored extension notes, and a seeded two-store Chromium test proves the boundary.
 
-The review fails because two live privacy statements are absent from `.factory/claims.json`: Home says “No tracking scripts,” and `/privacy` says clearing site browser storage “removes everything.” The second statement also fails to distinguish web-app data from extension data. Exact fixes and proposed tests are in F-4-1 and F-4-2.
+The one-click `?demo=1` sandbox, source-linked review workflow, extension/web JSON transfer, first-screen copy, routing, 404, legal pages, focus restoration, mobile layout, local-first storage, offline reload, and field-guide visual identity remain intact.
 
-## Verification performed
+## How to run and verify
 
-- Fresh live Chromium contexts at 390 × 844 and 1440 × 900.
-- One-click demo reveal, capture, review, JSON export, Reset, Exit, real-data sentinel, and offline reload.
-- Same-origin request and console/page-error logging for the live flow.
-- Live metadata, one-h1/main/lang checks, Axe scans, 404, security headers, deep links, Back/Forward focus/scroll/announcement, and all-link crawl.
-- Every `.factory/claims.json` command run separately after `npm ci` in clean clone `/tmp/rmr-review4-clean-wFgf4r`.
-- `npm test -- --reporter=line`: 53 passed, 2 intentional skips.
-- `npm run typecheck`: passed.
-- `npm run verify:deployment`: passed.
-- `/opt/fleet/lib/verify-url.sh https://reading-margin-recall.sociobot.in /tmp/rmr-review4-verify-url`: passed after creating the evidence directory.
+```sh
+npm ci
+npm run typecheck
+npm test
+npm run build
+npm run verify:deployment
+npm run deploy:site
+```
 
-## Next steps
+The live demo is `https://reading-margin-recall.sociobot.in/?demo=1`. It loads three bundled French, German, and Spanish notes in `demo:` storage. **Reset demo** restores the samples; **Exit demo and use my notes** deletes demo keys.
 
-1. Resolve F-4-1 by removing “No tracking scripts” or registering and directly testing the exact promise.
-2. Resolve F-4-2 with scoped web-app/extension deletion wording and a seeded two-store test.
-3. Re-run every claim command and `npm test` before the next review.
+## Evidence
 
-No product code was changed during this review.
+- Clean clone `/tmp/rmr-polish4-clean-dWd58t` ran all 16 exact `.factory/claims.json` commands separately after `npm ci`; all passed.
+- Full browser suite: 57 passed, 2 intentional mobile-project skips, 0 failures.
+- Typecheck, production build, deployment-tree verification, diff check, and production dependency audit passed.
+- The deployed receipt, shell assets, service worker, and 14,726-byte MV3 ZIP byte-matched the repair code commit. `npm run verify:live` passed its HTTP 404, headers, route, offline, keyboard, request-privacy, mobile, and Axe checks.
+- Live cold checks: `verify-url.sh` reported 797 ms load and no browser errors; the six-route/full-demo tracking proof observed no cookies, beacons, analytics, or cross-origin requests; a live site-clear left a seeded extension note untouched.
+- Lighthouse: 100 Performance, 100 Accessibility, 100 Best Practices, 100 SEO; LCP 1,100 ms, TBT 37 ms, CLS 0.
+- Screenshots and reports: `.factory/evidence/polish-4/`.
+
+## Known gaps and next steps
+
+None. No paid tier, account, analytics, backend, or AI service is intentionally included; that preserves the brief’s local-first workflow.
