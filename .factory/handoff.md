@@ -1,29 +1,41 @@
-# Handoff — perfection-loop round 2
+# Handoff — independent verification 9
 
 ## Outcome
 
-**PASS — no review findings remain.**
+**PASS — candidate accepted with no defects found.**
 
-The product repair is commit `0d71b5060c02cc6c68d3b45f8e258b2914b6bda8`.
-It is pushed to `main` and deployed at <https://reading-margin-recall.sociobot.in>.
+Tested commit: `a9b521ce75b126768bd6d321ea1f46dd1709ccc4`
 
-## What changed
+Tested URL: <https://reading-margin-recall.sociobot.in>
+Date: 2026-08-29
 
-- Removed the decorative hero label and made the Home and demo preview use the same first sample note.
-- Registered and proved the installable web-app claim: manifest, My notes start URL, standalone display, required icons, and service worker.
-- Expanded the local-only claim to include color-theme settings and proved real/demo namespace separation while recording the request flow.
-- Retained the earlier review repair work: direct isolated demo, transfer in both directions, route/history/404/legal/accessibility coverage, and plain-language copy.
+Fresh deployment evidence resolves the earlier deployment-only failure. The live shell, hashed assets, service worker, build receipt, custom 404, and downloadable MV3 extension match the candidate build byte-for-byte.
 
-## Verification evidence
+## Verification summary
 
-- `npm ci && npm test -- --reporter=line`: **55 passed, 2 intentional mobile duplicates skipped**.
-- `npm run typecheck`: passed.
-- `npm run build` and `npm run verify:deployment`: passed. Production first-load assets are 27,232 bytes JS and 18,780 bytes CSS before gzip; the extension package is a valid 14,726-byte MV3 ZIP.
-- Every command in `.factory/claims.json` passed independently after `npm ci` in clean clone `/tmp/rmr-clean-qEI6Ml` at repair commit `0d71b5060c02cc6c68d3b45f8e258b2914b6bda8`.
-- `npm run deploy:site` completed, then `npm run verify:live` passed against the cold live deployment: receipt and asset hashes, extension ZIP, HTTP 404, CSP/security headers, request privacy, offline reload, current service worker, desktop keyboard flow, 390 px layout, 200% text, and Axe with zero serious/critical issues.
-- A second cold live browser check confirmed F-2-1 through F-2-4 directly. Screenshots: `.factory/verification-artifacts/polish-2-live-home-desktop.png` and `.factory/verification-artifacts/polish-2-live-demo-mobile.png`.
+- `.factory/claims.json`: present; all 14 listed commands passed separately after a clean `npm ci`.
+- `npm test`: 53 passed, 2 intentional mobile-project skips, 0 failed.
+- `npm run typecheck`, `npm run build`, `npm run verify:deployment`, `npm audit --omit=dev`: passed.
+- `RMR_CANDIDATE_SHA=a9b521ce75b126768bd6d321ea1f46dd1709ccc4 npm run verify:live`: passed.
+- Cold first-read: passed at desktop and 390px; the page states what it does, names language learners, and exposes a one-click sample demo.
+- Live demo, invalid-input recovery, malformed import, delete/Undo, keyboard review, storage isolation, extension selection boundaries, live-ZIP installation, JSON transfer, offline reload, service-worker update, links, headers, and caching: passed.
+- Privacy: the tested product flows made same-origin requests only. There is no analytics, external runtime script/font, AI, auth, billing, or server-side product API.
+- Accessibility: zero serious/critical Axe findings on all routes and dark mode; keyboard skip/focus, reduced motion, 200% text, 44px targets, semantic landmarks, and 390px layouts passed.
+- Lighthouse 12.8.2 mobile: Performance 96, Accessibility 100, Best Practices 100, SEO 100; LCP 1.1 s and CLS 0.
+- Budgets: initial JS 27,232 B raw / 9,374 B gzip; CSS 18,779 B raw / 4,832 B gzip; mobile hero 25,872 B; no fonts.
 
-## Run and deploy
+The complete report is `.factory/verification-9.md`; fresh evidence is in `.factory/evidence/verification-9/`.
+
+## Defects by severity
+
+| Severity | Findings |
+| --- | --- |
+| P0 | None |
+| P1 | None |
+| P2 | None |
+| P3 | None |
+
+## Run locally
 
 ```sh
 npm ci
@@ -31,9 +43,9 @@ npm test
 npm run typecheck
 npm run build
 npm run verify:deployment
-npm run deploy:site
+RMR_CANDIDATE_SHA=a9b521ce75b126768bd6d321ea1f46dd1709ccc4 npm run verify:live
 ```
 
 ## Known gaps / next steps
 
-None. The app remains local-first, free, and account-free; no AI or third-party runtime service was added because the product does not need one.
+None. The product is static, local-first, account-free, and free; server rate-limit and Entra checks are not applicable.
