@@ -52,6 +52,7 @@ test('deployment policy keeps execution and requests same-origin', async () => {
     globalHeaders: Record<string, string>;
     navigationFallback: { exclude: string[] };
     responseOverrides: Record<string, { rewrite: string; statusCode: number }>;
+    routes: Array<{ route: string; statusCode?: number; rewrite?: string }>;
   };
   const csp = config.globalHeaders['Content-Security-Policy'];
   expect(csp).toContain("default-src 'self'");
@@ -62,6 +63,7 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   expect(config.globalHeaders['X-Content-Type-Options']).toBe('nosniff');
   expect(config.globalHeaders['Referrer-Policy']).toBe('strict-origin-when-cross-origin');
   expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html', statusCode: 404 } });
+  expect(config.routes).toContainEqual({ route: '/*', statusCode: 404 });
   await access('site/404.html');
   await access('site/public/404.css');
 });
