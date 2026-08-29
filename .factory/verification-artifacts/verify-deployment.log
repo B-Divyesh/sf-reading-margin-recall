@@ -1,0 +1,22 @@
+
+> reading-margin-recall@1.0.0 verify:deployment
+> node scripts/verify-deployment-tree.mjs
+
+{
+  "siteRoot": "/tmp/rmr-verify8-clean-5qBWir/dist/site",
+  "commit": "109fca00449ff17b2b8ac3e0e83077ffcde4723c",
+  "extension": {
+    "bytes": 14726,
+    "sha256": "2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047",
+    "manifestVersion": 3
+  },
+  "receipt": {
+    "commit": "109fca00449ff17b2b8ac3e0e83077ffcde4723c",
+    "extension": {
+      "path": "/downloads/reading-margin-recall-chrome.zip",
+      "bytes": 14726,
+      "sha256": "2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047"
+    }
+  },
+  "notFound": "product-owned 404 configured"
+}

@@ -1,0 +1,93 @@
+
+> reading-margin-recall@1.0.0 test
+> npm run build && playwright test --grep @claim:http-source-links
+
+
+> reading-margin-recall@1.0.0 build
+> npm run build:site
+
+
+> reading-margin-recall@1.0.0 build:site
+> node scripts/build.mjs
+
+
+> reading-margin-recall@1.0.0 build:extension
+> wxt build && wxt zip
+
+[log]
+WXT 0.21.4
+[info] Building chrome-mv3 for production with Vite 7.3.6
+[?25l⠋ Preparing...[K⠋ [1/2] content[K⠙ [1/2] content[K⠹ [1/2] content[K⠸ [1/2] content[K⠸ [2/2] popup[K⠼ [2/2] popup[K⠴ [2/2] popup[K[K[?25h[K[?25h[success] Built extension in 674 ms
+  ├─ .output/chrome-mv3/manifest.json               482 B
+  ├─ .output/chrome-mv3/popup.html                  640 B
+  ├─ .output/chrome-mv3/chunks/popup-CqlkeANC.js    6.88 kB
+  ├─ .output/chrome-mv3/content-scripts/content.js  9.29 kB
+  ├─ .output/chrome-mv3/assets/popup-Dy2s2jy1.css   2.88 kB
+  ├─ .output/chrome-mv3/icons/128.png               2.29 kB
+  ├─ .output/chrome-mv3/icons/16.png                586 B
+  ├─ .output/chrome-mv3/icons/32.png                1.15 kB
+  └─ .output/chrome-mv3/icons/48.png                1.67 kB
+Σ Total size: 25.86 kB
+[success] Finished in 799 ms
+[log]
+WXT 0.21.4
+[info] Building chrome-mv3 for production with Vite 7.3.6
+[?25l⠋ Preparing...[K⠋ [1/2] content[K⠙ [1/2] content[K⠹ [1/2] content[K⠸ [1/2] content[K⠸ [2/2] popup[K⠼ [2/2] popup[K⠴ [2/2] popup[K[K[?25h[K[?25h[success] Built extension in 618 ms
+  ├─ .output/chrome-mv3/manifest.json               482 B
+  ├─ .output/chrome-mv3/popup.html                  640 B
+  ├─ .output/chrome-mv3/chunks/popup-CqlkeANC.js    6.88 kB
+  ├─ .output/chrome-mv3/content-scripts/content.js  9.29 kB
+  ├─ .output/chrome-mv3/assets/popup-Dy2s2jy1.css   2.88 kB
+  ├─ .output/chrome-mv3/icons/128.png               2.29 kB
+  ├─ .output/chrome-mv3/icons/16.png                586 B
+  ├─ .output/chrome-mv3/icons/32.png                1.15 kB
+  └─ .output/chrome-mv3/icons/48.png                1.67 kB
+Σ Total size: 25.86 kB
+[info] Zipping extension...
+[success] Zipped extension in 15 ms
+  └─ .output/reading-margin-recall-1.0.0-chrome.zip  14.73 kB
+Σ Total size: 14.73 kB
+[success] Finished in 792 ms
+
+> reading-margin-recall@1.0.0 build:site:vite
+> vite build --config vite.config.ts
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 5 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/site/index.html                  1.99 kB │ gzip: 0.71 kB
+../dist/site/assets/index-C-TtKaKB.css  18.95 kB │ gzip: 4.86 kB
+../dist/site/assets/index-CZ1lJkID.js   27.23 kB │ gzip: 9.40 kB
+✓ built in 266ms
+{
+  "siteRoot": "/work/repo/dist/site",
+  "commit": "109fca00449ff17b2b8ac3e0e83077ffcde4723c",
+  "extension": {
+    "bytes": 14726,
+    "sha256": "2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047",
+    "manifestVersion": 3
+  },
+  "receipt": {
+    "commit": "109fca00449ff17b2b8ac3e0e83077ffcde4723c",
+    "extension": {
+      "path": "/downloads/reading-margin-recall-chrome.zip",
+      "bytes": 14726,
+      "sha256": "2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047"
+    }
+  },
+  "notFound": "product-owned 404 configured"
+}
+[WebServer] (node:12123) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:12141) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12141) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/claims.spec.ts:197:1 › @claim:http-source-links @regression:source-url-scheme rejects non-web URLs and never renders them as links (2.4s)
+
+  1 passed (5.3s)

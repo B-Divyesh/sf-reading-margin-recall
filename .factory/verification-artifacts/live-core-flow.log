@@ -1,0 +1,27 @@
+{
+  "result": "PASS",
+  "demoIsolation": false,
+  "inputRecovery": "passed",
+  "invalidImportAtomic": "passed",
+  "keyboardGrade": {
+    "lastGrade": 1,
+    "reviews": 1,
+    "dueInMinutes": 9.9992
+  },
+  "deleteCancelUndo": "passed",
+  "axeSeriousCritical": 0,
+  "serviceWorker": {
+    "active": "https://reading-margin-recall.sociobot.in/sw.js",
+    "controller": "https://reading-margin-recall.sociobot.in/sw.js",
+    "waiting": null,
+    "caches": [
+      "reading-margin-recall-v7"
+    ]
+  },
+  "offlineReload": "passed",
+  "requests": {
+    "total": 16,
+    "thirdParty": 0
+  },
+  "errors": []
+}

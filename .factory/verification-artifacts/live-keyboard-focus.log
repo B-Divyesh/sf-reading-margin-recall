@@ -1,0 +1,19 @@
+{
+  "result": "PASS",
+  "focus": {
+    "text": "Skip to main content",
+    "focusVisible": true,
+    "outline": "rgb(181, 111, 0) solid 3px",
+    "box": {
+      "x": 8,
+      "y": 8,
+      "w": 198.578125,
+      "h": 48.796875
+    }
+  },
+  "reducedMotion": {
+    "animation": "1e-05s",
+    "transition": "1e-05s"
+  },
+  "skipTarget": "main"
+}

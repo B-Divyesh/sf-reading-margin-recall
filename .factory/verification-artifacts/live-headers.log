@@ -1,0 +1,83 @@
+
+URL http://reading-margin-recall.sociobot.in/
+HTTP/1.1 301 Moved Permanently
+Content-Length: 0
+Location: https://reading-margin-recall.sociobot.in/
+
+URL https://reading-margin-recall.sociobot.in/
+HTTP/2 200
+content-type: text/html
+cache-control: public, must-revalidate, max-age=30
+content-length: 1986
+strict-transport-security: max-age=31536000; includeSubDomains
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests
+
+URL https://reading-margin-recall.sociobot.in/assets/index-CZ1lJkID.js
+HTTP/2 200
+content-type: text/javascript
+cache-control: public, max-age=31536000, immutable
+content-length: 27232
+strict-transport-security: max-age=31536000; includeSubDomains
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests
+
+URL https://reading-margin-recall.sociobot.in/assets/index-C-TtKaKB.css
+HTTP/2 200
+content-type: text/css
+cache-control: public, max-age=31536000, immutable
+content-length: 18952
+strict-transport-security: max-age=31536000; includeSubDomains
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests
+
+URL https://reading-margin-recall.sociobot.in/sw.js
+HTTP/2 200
+content-type: text/javascript
+cache-control: public, must-revalidate, max-age=30
+content-length: 1734
+strict-transport-security: max-age=31536000; includeSubDomains
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests
+
+URL https://reading-margin-recall.sociobot.in/build-info.json
+HTTP/2 200
+content-type: application/json
+cache-control: no-store
+content-length: 241
+strict-transport-security: max-age=31536000; includeSubDomains
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests
+x-robots-tag: noindex
+
+URL https://reading-margin-recall.sociobot.in/downloads/reading-margin-recall-chrome.zip
+HTTP/2 200
+content-type: application/zip
+cache-control: public, max-age=3600
+content-length: 14726
+strict-transport-security: max-age=31536000; includeSubDomains
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests
+
+URL https://reading-margin-recall.sociobot.in/definitely-missing
+HTTP/2 404
+content-type: text/html
+cache-control: public, must-revalidate, max-age=30
+content-length: 2612
+strict-transport-security: max-age=31536000; includeSubDomains
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests

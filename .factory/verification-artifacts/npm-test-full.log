@@ -1,0 +1,157 @@
+
+> reading-margin-recall@1.0.0 test
+> npm run build && playwright test
+
+
+> reading-margin-recall@1.0.0 build
+> npm run build:site
+
+
+> reading-margin-recall@1.0.0 build:site
+> node scripts/build.mjs
+
+
+> reading-margin-recall@1.0.0 build:extension
+> wxt build && wxt zip
+
+[log]
+WXT 0.21.4
+[info] Building chrome-mv3 for production with Vite 7.3.6
+[?25l⠋ Preparing...[K⠋ [1/2] content[K⠙ [1/2] content[K⠹ [1/2] content[K⠹ [2/2] popup[K⠸ [2/2] popup[K⠼ [2/2] popup[K⠴ [2/2] popup[K[K[?25h[K[?25h[success] Built extension in 684 ms
+  ├─ .output/chrome-mv3/manifest.json               482 B
+  ├─ .output/chrome-mv3/popup.html                  640 B
+  ├─ .output/chrome-mv3/chunks/popup-CqlkeANC.js    6.88 kB
+  ├─ .output/chrome-mv3/content-scripts/content.js  9.29 kB
+  ├─ .output/chrome-mv3/assets/popup-Dy2s2jy1.css   2.88 kB
+  ├─ .output/chrome-mv3/icons/128.png               2.29 kB
+  ├─ .output/chrome-mv3/icons/16.png                586 B
+  ├─ .output/chrome-mv3/icons/32.png                1.15 kB
+  └─ .output/chrome-mv3/icons/48.png                1.67 kB
+Σ Total size: 25.86 kB
+[success] Finished in 966 ms
+[log]
+WXT 0.21.4
+[info] Building chrome-mv3 for production with Vite 7.3.6
+[?25l⠋ Preparing...[K⠋ [1/2] content[K⠙ [1/2] content[K⠹ [1/2] content[K⠹ [2/2] popup[K⠸ [2/2] popup[K⠼ [2/2] popup[K[K[?25h[K[?25h[success] Built extension in 626 ms
+  ├─ .output/chrome-mv3/manifest.json               482 B
+  ├─ .output/chrome-mv3/popup.html                  640 B
+  ├─ .output/chrome-mv3/chunks/popup-CqlkeANC.js    6.88 kB
+  ├─ .output/chrome-mv3/content-scripts/content.js  9.29 kB
+  ├─ .output/chrome-mv3/assets/popup-Dy2s2jy1.css   2.88 kB
+  ├─ .output/chrome-mv3/icons/128.png               2.29 kB
+  ├─ .output/chrome-mv3/icons/16.png                586 B
+  ├─ .output/chrome-mv3/icons/32.png                1.15 kB
+  └─ .output/chrome-mv3/icons/48.png                1.67 kB
+Σ Total size: 25.86 kB
+[info] Zipping extension...
+[success] Zipped extension in 26 ms
+  └─ .output/reading-margin-recall-1.0.0-chrome.zip  14.73 kB
+Σ Total size: 14.73 kB
+[success] Finished in 756 ms
+
+> reading-margin-recall@1.0.0 build:site:vite
+> vite build --config vite.config.ts
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 5 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/site/index.html                  1.99 kB │ gzip: 0.71 kB
+../dist/site/assets/index-C-TtKaKB.css  18.95 kB │ gzip: 4.86 kB
+../dist/site/assets/index-CZ1lJkID.js   27.23 kB │ gzip: 9.40 kB
+✓ built in 260ms
+{
+  "siteRoot": "/tmp/rmr-verify8-clean-5qBWir/dist/site",
+  "commit": "109fca00449ff17b2b8ac3e0e83077ffcde4723c",
+  "extension": {
+    "bytes": 14726,
+    "sha256": "2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047",
+    "manifestVersion": 3
+  },
+  "receipt": {
+    "commit": "109fca00449ff17b2b8ac3e0e83077ffcde4723c",
+    "extension": {
+      "path": "/downloads/reading-margin-recall-chrome.zip",
+      "bytes": 14726,
+      "sha256": "2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047"
+    }
+  },
+  "notFound": "product-owned 404 configured"
+}
+[WebServer] (node:12648) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 54 tests using 1 worker
+
+(node:12666) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12666) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/a-offline.spec.ts:3:1 › @claim:offline-reload works after the first visit (1.0s)
+  ✓   2 [chromium] › tests/a-offline.spec.ts:13:1 › @regression:service-worker-update keeps one active current worker (588ms)
+  ✓   3 [chromium] › tests/claims.spec.ts:12:1 › @claim:source-linked-capture saves a full recall note (2.0s)
+  ✓   4 [chromium] › tests/claims.spec.ts:24:1 › @claim:demo-isolated keeps real notes separate (1.0s)
+  ✓   5 [chromium] › tests/claims.spec.ts:39:1 › @claim:local-only sends no reading data off origin (1.9s)
+  ✓   6 [chromium] › tests/claims.spec.ts:52:1 › @claim:json-backup exports every demo note (730ms)
+  ✓   7 [chromium] › tests/claims.spec.ts:65:1 › @claim:keyboard-review reveals and grades with keys (939ms)
+  ✓   8 [chromium] › tests/claims.spec.ts:73:1 › @claim:free-tools @regression:no-dead-billing gives every tool without a license gate (836ms)
+  ✓   9 [chromium] › tests/claims.spec.ts:87:1 › @claim:review-filters shows difficult notes and one selected source (1.1s)
+  ✓  10 [chromium] › tests/claims.spec.ts:104:1 › @claim:json-transfer moves backups between the extension and web app both ways (4.2s)
+  ✓  11 [chromium] › tests/claims.spec.ts:165:1 › @claim:extension-download @regression:production-download serves the exact built MV3 package (37ms)
+  ✓  12 [chromium] › tests/claims.spec.ts:187:1 › @claim:delete-notes removes a saved note from this device (822ms)
+  ✓  13 [chromium] › tests/claims.spec.ts:197:1 › @claim:http-source-links @regression:source-url-scheme rejects non-web URLs and never renders them as links (2.2s)
+  ✓  14 [chromium] › tests/claims.spec.ts:213:1 › @regression:incomplete-import-is-atomic rejects a structurally incomplete backup without poisoning saved notes (778ms)
+  ✓  15 [chromium] › tests/claims.spec.ts:230:1 › @regression:storage-write-failure-keeps-capture-form-and-never-announces-success (1.9s)
+  ✓  16 [chromium] › tests/claims.spec.ts:251:1 › @regression:demo-source-return-link-is-live (1.1s)
+  ✓  17 [chromium] › tests/quality.spec.ts:8:3 › page quality / (2.1s)
+  ✓  18 [chromium] › tests/quality.spec.ts:8:3 › page quality /demo (1.7s)
+  ✓  19 [chromium] › tests/quality.spec.ts:8:3 › page quality /library (1.5s)
+  ✓  20 [chromium] › tests/quality.spec.ts:8:3 › page quality /review (1.5s)
+  ✓  21 [chromium] › tests/quality.spec.ts:8:3 › page quality /privacy (1.6s)
+  ✓  22 [chromium] › tests/quality.spec.ts:8:3 › page quality /terms (1.4s)
+  ✓  23 [chromium] › tests/quality.spec.ts:8:3 › page quality /missing-page (1.3s)
+  ✓  24 [chromium] › tests/quality.spec.ts:22:1 › @regression:routes set unique titles, descriptions, canonicals, and social metadata (1.8s)
+  ✓  25 [chromium] › tests/quality.spec.ts:42:1 › @regression:mobile targets and readable text meet the 390px baseline on every route (1.2s)
+  ✓  26 [chromium] › tests/quality.spec.ts:84:1 › @regression:demo-exit discards edited demo storage through ordinary navigation (1.1s)
+  ✓  27 [chromium] › tests/quality.spec.ts:106:1 › @regression:built-404 is product-owned, accessible, and same-origin (1.1s)
+  ✓  28 [chromium] › tests/quality.spec.ts:130:1 › @regression:first-screen shows all facts and an actionable sample at required viewports (1.3s)
+  ✓  29 [chromium] › tests/quality.spec.ts:150:1 › @regression:history restores scroll, focus, and live announcements (1.6s)
+  ✓  30 [chromium] › tests/quality.spec.ts:166:1 › keyboard focus and reduced motion remain usable at 390px (737ms)
+  ✓  31 [chromium] › tests/quality.spec.ts:189:1 › deployment policy keeps execution and requests same-origin (11ms)
+(node:13304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13323) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13354) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  32 [chromium] › tests/quality.spec.ts:219:1 › @regression:build-site creates the complete deploy root from nothing (4.4s)
+  ✓  33 [chromium] › tests/quality.spec.ts:243:1 › extension build is packaged as MV3 (3ms)
+  ✓  34 [chromium] › tests/quality.spec.ts:250:1 › @claim:extension-selection captures only selected page text (5.3s)
+  ✓  35 [chromium] › tests/quality.spec.ts:318:1 › dark treatment has no serious accessibility violations (1.9s)
+(node:13574) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13574) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  36 [mobile] › tests/quality.spec.ts:8:3 › page quality / (1.9s)
+  ✓  37 [mobile] › tests/quality.spec.ts:8:3 › page quality /demo (1.9s)
+  ✓  38 [mobile] › tests/quality.spec.ts:8:3 › page quality /library (1.5s)
+  ✓  39 [mobile] › tests/quality.spec.ts:8:3 › page quality /review (1.3s)
+  ✓  40 [mobile] › tests/quality.spec.ts:8:3 › page quality /privacy (1.4s)
+  ✓  41 [mobile] › tests/quality.spec.ts:8:3 › page quality /terms (1.3s)
+  ✓  42 [mobile] › tests/quality.spec.ts:8:3 › page quality /missing-page (1.3s)
+  ✓  43 [mobile] › tests/quality.spec.ts:22:1 › @regression:routes set unique titles, descriptions, canonicals, and social metadata (1.5s)
+  ✓  44 [mobile] › tests/quality.spec.ts:42:1 › @regression:mobile targets and readable text meet the 390px baseline on every route (1.3s)
+  ✓  45 [mobile] › tests/quality.spec.ts:84:1 › @regression:demo-exit discards edited demo storage through ordinary navigation (942ms)
+  ✓  46 [mobile] › tests/quality.spec.ts:106:1 › @regression:built-404 is product-owned, accessible, and same-origin (1.2s)
+  ✓  47 [mobile] › tests/quality.spec.ts:130:1 › @regression:first-screen shows all facts and an actionable sample at required viewports (1.5s)
+  ✓  48 [mobile] › tests/quality.spec.ts:150:1 › @regression:history restores scroll, focus, and live announcements (1.3s)
+  ✓  49 [mobile] › tests/quality.spec.ts:166:1 › keyboard focus and reduced motion remain usable at 390px (724ms)
+  ✓  50 [mobile] › tests/quality.spec.ts:189:1 › deployment policy keeps execution and requests same-origin (13ms)
+  -  51 [mobile] › tests/quality.spec.ts:219:1 › @regression:build-site creates the complete deploy root from nothing
+  ✓  52 [mobile] › tests/quality.spec.ts:243:1 › extension build is packaged as MV3 (3ms)
+  -  53 [mobile] › tests/quality.spec.ts:250:1 › @claim:extension-selection captures only selected page text
+  ✓  54 [mobile] › tests/quality.spec.ts:318:1 › dark treatment has no serious accessibility violations (1.6s)
+
+  2 skipped
+  52 passed (1.3m)

@@ -1,0 +1,25 @@
+
+LOCAL PRODUCTION ASSET SIZES
+109412 dist/site/assets/field-guide-hero.webp
+63348 dist/site/assets/og-field-guide.webp
+54705 dist/site/assets/icon-512.png
+27232 dist/site/assets/index-CZ1lJkID.js
+25872 dist/site/assets/field-guide-hero-mobile.webp
+18952 dist/site/assets/index-C-TtKaKB.css
+14726 dist/site/downloads/reading-margin-recall-chrome.zip
+9303 dist/site/assets/icon-192.png
+8593 dist/site/assets/apple-touch.png
+3511 dist/site/404.css
+2612 dist/site/404.html
+1986 dist/site/index.html
+1734 dist/site/sw.js
+1471 dist/site/staticwebapp.config.json
+541 dist/site/sitemap.xml
+518 dist/site/assets/leaf-mark.svg
+445 dist/site/manifest.webmanifest
+241 dist/site/build-info.json
+87 dist/site/robots.txt
+
+GZIP JS CSS
+9388 dist/site/assets/index-CZ1lJkID.js
+4875 dist/site/assets/index-C-TtKaKB.css

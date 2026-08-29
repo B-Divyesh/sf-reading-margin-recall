@@ -1,0 +1,153 @@
+{
+  "result": "PASS",
+  "httpLinks": [
+    {
+      "href": "https://reading-margin-recall.sociobot.in/",
+      "text": "Return home",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/?demo=1",
+      "text": "Demo",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/library",
+      "text": "My notes",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/review",
+      "text": "Review",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/privacy",
+      "text": "Privacy",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://fr.wikisource.org/wiki/Les_Chansons_des_rues_et_des_bois",
+      "text": "Return to “Les Chansons des rues et des bois” (external) ↗",
+      "rel": "external",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/terms",
+      "text": "Terms",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://hello-factory.sociobot.in/",
+      "text": "Built by Param Factory (external)",
+      "rel": "external",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/library?demo=1",
+      "text": "My notes",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/review?demo=1",
+      "text": "Review",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/privacy?demo=1",
+      "text": "Privacy",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://www.projekt-gutenberg.org/goethe/faust2/faust2.html",
+      "text": "Open original page Faust, der Tragödie zweiter Teil (external) ↗",
+      "rel": "external",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://es.wikisource.org/wiki/Don_Quijote_de_la_Mancha",
+      "text": "Open original page Don Quijote de la Mancha, capítulo I (external) ↗",
+      "rel": "external",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/downloads/reading-margin-recall-chrome.zip",
+      "text": "Download the extension",
+      "rel": "",
+      "isSameDocument": false,
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/robots.txt",
+      "text": "/robots.txt",
+      "rel": "",
+      "status": 200
+    },
+    {
+      "href": "https://reading-margin-recall.sociobot.in/sitemap.xml",
+      "text": "/sitemap.xml",
+      "rel": "",
+      "status": 200
+    }
+  ],
+  "fragmentLinks": [
+    {
+      "page": "/",
+      "href": "https://reading-margin-recall.sociobot.in/#main",
+      "targetExists": true
+    },
+    {
+      "page": "/?demo=1",
+      "href": "https://reading-margin-recall.sociobot.in/?demo=1#main",
+      "targetExists": true
+    },
+    {
+      "page": "/library",
+      "href": "https://reading-margin-recall.sociobot.in/library#main",
+      "targetExists": true
+    },
+    {
+      "page": "/review?demo=1",
+      "href": "https://reading-margin-recall.sociobot.in/review?demo=1#main",
+      "targetExists": true
+    },
+    {
+      "page": "/privacy",
+      "href": "https://reading-margin-recall.sociobot.in/privacy#main",
+      "targetExists": true
+    },
+    {
+      "page": "/terms",
+      "href": "https://reading-margin-recall.sociobot.in/terms#main",
+      "targetExists": true
+    },
+    {
+      "page": "/definitely-missing",
+      "href": "https://reading-margin-recall.sociobot.in/definitely-missing#main",
+      "targetExists": true
+    }
+  ],
+  "bad": []
+}

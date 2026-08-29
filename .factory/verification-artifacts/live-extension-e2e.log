@@ -1,0 +1,17 @@
+{
+  "result": "PASS",
+  "package": "/tmp/rmr-live-extension-vYmkl9/unpacked",
+  "manifestVersion": 3,
+  "permissions": [
+    "storage",
+    "activeTab",
+    "downloads"
+  ],
+  "selectedText": "For language learners who want selected sentences to become source-linked review notes.",
+  "siteStorageUntouched": true,
+  "popupReviewGradeDelete": "passed",
+  "popupAxeSeriousCritical": 0,
+  "httpRequests": 7,
+  "crossOriginHttpRequests": [],
+  "errors": []
+}

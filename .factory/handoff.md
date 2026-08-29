@@ -1,73 +1,49 @@
-# Handoff — polish round 1
+# Handoff — independent verification 8
 
 ## Outcome
 
-All F-1-1 through F-1-23 findings in `.factory/review-1.md` are fixed. There were no earlier review or polish files.
-The browser-extension artifact and static deployment model are unchanged.
-The botanical field-guide identity, palette, type, illustration, and motion remain intact.
+**PASS — release candidate accepted.**
 
-The canonical one-click sample entry is `https://reading-margin-recall.sociobot.in/?demo=1`.
-It shows an actionable sample review in the first 390×844 screen.
-The banner exposes Reset demo and Exit demo and use my notes.
-Demo data remains under `demo:` keys and never enters the real note namespace.
+- Candidate: `109fca00449ff17b2b8ac3e0e83077ffcde4723c`
+- Live URL: <https://reading-margin-recall.sociobot.in>
+- Full report: `.factory/verification-8.md`
 
-The extension and web app now exchange the same validated JSON backup.
-Export and import work in both directions, including import into an empty web collection.
+The earlier deployment-only failure is resolved. The live shell, hashed assets, service worker, build receipt, custom 404, and installable Manifest V3 ZIP match the clean candidate build.
 
-## Local verification
+## Verification summary
 
-- `npm test`: 52 passed; 2 intentional mobile duplicates skipped.
-- `npm run typecheck`: passed.
-- `npm run build`: passed and produced `dist/site` plus the packaged extension ZIP.
-- `npm run verify:deployment`: passed.
-- Every `.factory/claims.json` command passed separately in clean clone `/tmp/rmr-clean-final-gQCu2v` at `72525aab1fce480bc446d48d164e70c91c321f6d`.
-- Playwright Axe found zero serious or critical issues across all routes, mobile routes, dark mode, the 404, and extension popup.
-- `verify-url.sh` passed with no console errors. Evidence: `.factory/evidence/polish-1/verify-url-local/verify.json`.
-- Lighthouse mobile-local: 100 performance, 100 accessibility, 100 best practices, and 100 SEO.
-- Lighthouse metrics: 1.5 s LCP, 0 CLS, and 30 ms total blocking time.
-- Initial bundles: 27,232-byte JavaScript and 18,952-byte CSS. The mobile hero is 25,872 bytes.
+- Every command in `.factory/claims.json`: 13/13 passed independently.
+- `npm test`: 52 passed, 2 intentional project duplicates skipped, 0 failed.
+- `npm run typecheck`, `npm run build`, and `npm run verify:deployment`: passed.
+- `npm audit --omit=dev`: 0 vulnerabilities. No lint script exists.
+- Exact live identity check with `RMR_CANDIDATE_SHA=109fca... npm run verify:live`: passed.
+- Cold first-read and one-click sample demo: passed.
+- Normal capture/review, invalid URL recovery, atomic invalid import, storage failure, delete/Undo, keyboard grades, JSON transfer, and extension selection boundaries: passed.
+- Downloaded live extension: 14,726-byte valid MV3 ZIP, SHA-256 `2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047`; clean-profile capture, popup review, and delete passed.
+- Live privacy log: zero cross-origin requests and zero console/page errors during the complete product flow.
+- Service-worker update and offline demo reload: passed.
+- Desktop and 390×844 mobile: zero serious/critical Axe findings; no overflow, undersized targets, or text below 16 px; 200% text and reduced motion passed.
+- Fresh Lighthouse mobile: 95 performance, 100 accessibility, 100 best practices, 100 SEO; LCP 2.19 s, TBT 199 ms, CLS 0.
+- Security headers, cache policy, HTTPS redirect, 404, discovered links, robots, sitemap, and bundle budgets: passed.
+- The product has no backend, sign-in, billing/product-unlock request, or server endpoint. Entra, concurrency, and API rate-limit checks are therefore not applicable.
 
-Screenshots:
+## Monetization deviation
 
-- `.factory/evidence/polish-1/landing-mobile.png`
-- `.factory/evidence/polish-1/landing-desktop.png`
-- `.factory/evidence/polish-1/demo-mobile.png`
-- `.factory/evidence/polish-1/demo-desktop.png`
-- `.factory/evidence/polish-1/404-desktop.png`
+The brief proposed a one-time purchase. The earlier checkout was not registered, returned 404, and did not provide the required rate limit; repository workers are not allowed to modify billing infrastructure. The release removes that dead promise and ships every complete tool free. This preserves the local-first job-to-be-done without exposing user data or presenting a purchase that cannot complete.
 
-## Live verification
+## Commands used
 
-`npm run deploy:site` deployed verified product commit `ac861d960c29bf078d8ff3a3ade9a8a063d63474` successfully.
-`npm run verify:live` passed build identity, assets, ZIP, HTTP 404, security headers, request privacy, offline reload, Axe, mobile layout, and 200% text.
-The final extension ZIP is 14,726 bytes with SHA-256 `2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047`.
-The live unknown route returned HTTP 404 with zero serious or critical Axe issues and zero third-party requests.
-A separate cold-browser pass rechecked the root, `/?demo=1`, history restoration, route announcements, and the complete 404 shell.
-Live Lighthouse scored 100 for performance, accessibility, best practices, and SEO.
-Its measured LCP was 1.1 s, CLS was 0, and total blocking time was 10 ms.
-
-Live evidence:
-
-- `.factory/evidence/polish-1/live-landing-mobile.png`
-- `.factory/evidence/polish-1/live-landing-desktop.png`
-- `.factory/evidence/polish-1/live-demo-mobile.png`
-- `.factory/evidence/polish-1/live-demo-desktop.png`
-- `.factory/evidence/polish-1/live-404-desktop.png`
-- `.factory/evidence/polish-1/verify-url-live/verify.json`
-- `.factory/evidence/polish-1/lighthouse-live.json`
-
-The final documentation-only commit is deployed after this handoff update.
-Its authoritative SHA is served at `/build-info.json` and compared with `origin/main` by `npm run verify:live`.
-
-## Run and verify
+These commands were run from the detached candidate before this verifier-only documentation commit was pushed. `verify:live` intentionally requires `origin/main` to equal the deployed product commit.
 
 ```sh
 npm ci
 npm test
 npm run typecheck
+npm run build
 npm run verify:deployment
-npm run deploy:site
+RMR_CANDIDATE_SHA=109fca00449ff17b2b8ac3e0e83077ffcde4723c npm run verify:live
 ```
 
 ## Known gaps and next steps
 
-None for this work order.
+No release-blocking gaps. If the factory later registers a billing product with enforced 429/`Retry-After` behavior, one-time paid features can be reconsidered as a separate scoped release.

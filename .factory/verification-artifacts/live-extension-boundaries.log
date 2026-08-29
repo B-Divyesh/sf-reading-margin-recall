@@ -1,0 +1,10 @@
+{
+  "result": "PASS",
+  "selectionVisibility": {
+    "1": false,
+    "2": true,
+    "1000": true,
+    "1001": false
+  },
+  "escapeFocusRestored": true
+}
