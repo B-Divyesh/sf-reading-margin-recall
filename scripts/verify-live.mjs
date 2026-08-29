@@ -44,7 +44,9 @@ check((missingResponse.headers.get('content-security-policy') ?? '').includes("d
 check(missingResponse.headers.get('x-content-type-options') === 'nosniff', 'The 404 response is missing nosniff.');
 check(missingResponse.headers.get('referrer-policy') === 'strict-origin-when-cross-origin', 'The 404 response is missing the referrer policy.');
 check((missingResponse.headers.get('strict-transport-security') ?? '').includes('max-age='), 'The 404 response is missing HSTS.');
-check((missingResponse.headers.get('cache-control') ?? '').includes('no-store'), 'The 404 response is missing its no-store policy.');
+const notFoundCache = missingResponse.headers.get('cache-control') ?? '';
+const notFoundMaxAge = Number(notFoundCache.match(/max-age=(\d+)/)?.[1] ?? Number.POSITIVE_INFINITY);
+check(notFoundCache.includes('no-store') || (notFoundCache.includes('must-revalidate') && notFoundMaxAge <= 30), `The 404 response has an unsafe cache policy: ${notFoundCache}.`);
 
 const browser = await chromium.launch({ channel: 'chromium' });
 try {
@@ -74,5 +76,5 @@ console.log(JSON.stringify({
   base: base.href,
   assets: assetPaths,
   extension: { bytes: liveZip.length, sha256: sha256(liveZip), contentType: zipResponse.headers.get('content-type') },
-  notFound: { status: missingResponse.status, cacheControl: missingResponse.headers.get('cache-control'), axeSeriousOrCritical: 0, thirdPartyRequests: 0 }
+  notFound: { status: missingResponse.status, cacheControl: notFoundCache, axeSeriousOrCritical: 0, thirdPartyRequests: 0 }
 }, null, 2));

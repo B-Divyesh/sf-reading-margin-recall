@@ -101,6 +101,7 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   expect(config.globalHeaders['X-Content-Type-Options']).toBe('nosniff');
   expect(config.globalHeaders['Referrer-Policy']).toBe('strict-origin-when-cross-origin');
   expect(config.globalHeaders['Strict-Transport-Security']).toContain('max-age=31536000');
+  expect(config.globalHeaders['Cache-Control']).toBe('public, must-revalidate, max-age=30');
   expect(config.mimeTypes['.zip']).toBe('application/zip');
   expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html' } });
   expect(config.routes).toContainEqual({ route: '/', rewrite: '/index.html' });
