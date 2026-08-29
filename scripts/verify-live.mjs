@@ -13,6 +13,31 @@ const severeAxeViolations = async (page) => {
   const results = await new AxeBuilder({ page }).analyze();
   return results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''));
 };
+const mobileBaseline = async (page) => page.evaluate(() => {
+  const visible = (element) => {
+    const style = getComputedStyle(element);
+    const box = element.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.height > 0;
+  };
+  const targets = [...document.querySelectorAll('a, button, input, select, textarea, [role="button"]')]
+    .filter(visible)
+    .map((element) => {
+      const target = element.matches('input[type="file"]') ? element.closest('label') ?? element : element;
+      const box = target.getBoundingClientRect();
+      return {
+        name: element.getAttribute('aria-label') ?? element.textContent?.trim() ?? element.tagName,
+        width: box.width,
+        height: box.height
+      };
+    })
+    .filter(({ width, height }) => width < 44 || height < 44);
+  const text = [...document.querySelectorAll('body *')]
+    .filter((element) => visible(element) && !element.closest('.sr-only'))
+    .filter((element) => [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()))
+    .map((element) => ({ text: element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 80), pixels: Number.parseFloat(getComputedStyle(element).fontSize) }))
+    .filter(({ pixels }) => pixels < 16);
+  return { overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, targets, text };
+});
 
 const rootResponse = await fetch(base);
 check(rootResponse.status === 200, `Live root returned ${rootResponse.status}.`);
@@ -71,6 +96,7 @@ check((missingResponse.headers.get('content-security-policy') ?? '').includes("d
 check(missingResponse.headers.get('x-content-type-options') === 'nosniff', 'The 404 response is missing nosniff.');
 check(missingResponse.headers.get('referrer-policy') === 'strict-origin-when-cross-origin', 'The 404 response is missing the referrer policy.');
 check((missingResponse.headers.get('strict-transport-security') ?? '').includes('max-age='), 'The 404 response is missing HSTS.');
+check(missingResponse.headers.get('x-robots-tag') === 'noindex', 'The 404 response is missing noindex.');
 const notFoundCache = missingResponse.headers.get('cache-control') ?? '';
 const notFoundMaxAge = Number(notFoundCache.match(/max-age=(\d+)/)?.[1] ?? Number.POSITIVE_INFINITY);
 check(notFoundCache.includes('no-store') || (notFoundCache.includes('must-revalidate') && notFoundMaxAge <= 30), `The 404 response has an unsafe cache policy: ${notFoundCache}.`);
@@ -153,14 +179,18 @@ try {
   const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   const mobilePage = await mobile.newPage();
   await mobilePage.emulateMedia({ reducedMotion: 'reduce' });
+  const mobileRoutes = ['/', '/demo', '/library', '/review?demo=1', '/privacy', '/terms', '/404.html'];
+  for (const route of mobileRoutes) {
+    await mobilePage.goto(new URL(route, base).href, { waitUntil: 'networkidle' });
+    const audit = await mobileBaseline(mobilePage);
+    check(audit.overflow <= 1, `The 390px ${route} route overflows by ${audit.overflow}px.`);
+    check(audit.targets.length === 0, `The 390px ${route} route has undersized targets: ${JSON.stringify(audit.targets)}.`);
+    check(audit.text.length === 0, `The 390px ${route} route has text below 16px: ${JSON.stringify(audit.text)}.`);
+    check((await severeAxeViolations(mobilePage)).length === 0, `Live 390px ${route} has serious or critical Axe violations.`);
+  }
   await mobilePage.goto(base.href, { waitUntil: 'networkidle' });
-  const overflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  check(overflow <= 1, `The 390px live landing overflows by ${overflow}px.`);
-  const demoTarget = await mobilePage.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Demo' }).boundingBox();
-  check((demoTarget?.width ?? 0) >= 44 && (demoTarget?.height ?? 0) >= 44, `The mobile Demo target is ${demoTarget?.width}×${demoTarget?.height}.`);
   const reducedDuration = await mobilePage.locator('.button').first().evaluate((element) => Number.parseFloat(getComputedStyle(element).transitionDuration) || 0);
   check(reducedDuration <= 0.001, `Reduced-motion transition duration is ${reducedDuration}s.`);
-  check((await severeAxeViolations(mobilePage)).length === 0, 'Live 390px landing has serious or critical Axe violations.');
   await mobilePage.evaluate(() => document.styleSheets[0]?.insertRule(':root { font-size: 32px !important; }'));
   const zoomOverflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   check(zoomOverflow <= 1, `The live landing overflows by ${zoomOverflow}px at 200% text.`);
@@ -177,5 +207,5 @@ console.log(JSON.stringify({
   extension: { bytes: liveZip.length, sha256: sha256(liveZip), contentType: zipResponse.headers.get('content-type') },
   notFound: { status: missingResponse.status, cacheControl: notFoundCache, axeSeriousOrCritical: 0, thirdPartyRequests: 0 },
   productFlow: { desktopCaptureReview: 'passed', keyboard: 'passed', offlineReload: 'passed', serviceWorkerUpdate: 'passed', thirdPartyRequests: 0 },
-  mobile: { viewport: '390x844', minimumDemoTarget: '44x44', textResize: '200%', axeSeriousOrCritical: 0 }
+  mobile: { viewport: '390x844', routes: 7, minimumTarget: '44x44', minimumText: '16px', textResize: '200%', axeSeriousOrCritical: 0 }
 }, null, 2));

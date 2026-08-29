@@ -5,7 +5,9 @@ import path from 'node:path';
 
 await rm('dist', { recursive: true, force: true });
 execFileSync('npm', ['run', 'build:extension'], { stdio: 'inherit' });
-execFileSync('npm', ['run', 'build:site'], { stdio: 'inherit' });
+// `npm run build:site` is the public, production-safe entry point. Keep the
+// Vite-only build private so it cannot be mistaken for a deployable site.
+execFileSync('npm', ['run', 'build:site:vite'], { stdio: 'inherit' });
 await cp('site/404.html', 'dist/site/404.html');
 await mkdir('dist/site/downloads', { recursive: true });
 const zipDir = '.output';

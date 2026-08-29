@@ -1,4 +1,4 @@
-const CACHE = 'reading-margin-recall-v5';
+const CACHE = 'reading-margin-recall-v6';
 const SHELL = ['/', '/demo', '/library', '/review', '/privacy', '/terms', '/manifest.webmanifest', '/assets/field-guide-hero.webp', '/assets/field-guide-hero-mobile.webp', '/assets/leaf-mark.svg'];
 self.addEventListener('install', (event) => event.waitUntil((async () => {
   const cache = await caches.open(CACHE);

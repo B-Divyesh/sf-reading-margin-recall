@@ -1,6 +1,6 @@
 import { chromium, expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, rm } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
@@ -19,14 +19,46 @@ for (const route of ['/', '/demo', '/library', '/review', '/privacy', '/terms', 
   });
 }
 
-test('mobile layout stays within 390px', async ({ page }) => {
-  await page.goto('/');
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  expect(overflow).toBeLessThanOrEqual(1);
-  await expect(page.getByRole('link', { name: 'Try it with sample data' })).toBeVisible();
-  const demoTarget = await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Demo' }).boundingBox();
-  expect(demoTarget?.width).toBeGreaterThanOrEqual(44);
-  expect(demoTarget?.height).toBeGreaterThanOrEqual(44);
+test('@regression:mobile targets and readable text meet the 390px baseline on every route', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const route of ['/', '/demo', '/library', '/review?demo=1', '/privacy', '/terms', '/404.html']) {
+    await page.goto(route);
+    const audit = await page.evaluate(() => {
+      const visible = (element: Element) => {
+        const style = getComputedStyle(element);
+        const box = element.getBoundingClientRect();
+        return style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.height > 0;
+      };
+      const targets = [...document.querySelectorAll<HTMLElement>('a, button, input, select, textarea, [role="button"]')]
+        .filter(visible)
+        .map((element) => {
+          const target = element.matches('input[type="file"]') ? element.closest('label') ?? element : element;
+          const box = target.getBoundingClientRect();
+          return {
+            name: element.getAttribute('aria-label') ?? element.textContent?.trim() ?? element.tagName,
+            width: box.width,
+            height: box.height
+          };
+        })
+        .filter(({ width, height }) => width < 44 || height < 44);
+      const text = [...document.querySelectorAll<HTMLElement>('body *')]
+        .filter((element) => visible(element) && !element.closest('.sr-only'))
+        .filter((element) => [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()))
+        .map((element) => ({
+          text: element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 80),
+          pixels: Number.parseFloat(getComputedStyle(element).fontSize)
+        }))
+        .filter(({ pixels }) => pixels < 16);
+      return {
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        targets,
+        text
+      };
+    });
+    expect(audit.overflow, `${route} horizontal overflow`).toBeLessThanOrEqual(1);
+    expect(audit.targets, `${route} undersized targets`).toEqual([]);
+    expect(audit.text, `${route} text below 16px`).toEqual([]);
+  }
 });
 
 test('@regression:demo-exit discards edited demo storage through ordinary navigation', async ({ page }) => {
@@ -121,8 +153,10 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   expect(built404).not.toMatch(/https?:\/\//);
 });
 
-test('@regression:deployment-content ships the installer and matching receipt at the exact deploy root', async () => {
-  const output = execFileSync('npm', ['run', 'verify:deployment'], { encoding: 'utf8' });
+test('@regression:build-site creates the complete deploy root from nothing', async ({}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium');
+  await rm('dist/site', { recursive: true, force: true });
+  const output = execFileSync('npm', ['run', 'build:site'], { encoding: 'utf8' });
   const report = JSON.parse(output.slice(output.indexOf('{'))) as {
     siteRoot: string;
     commit: string;
@@ -138,6 +172,9 @@ test('@regression:deployment-content ships the installer and matching receipt at
     bytes: zip.byteLength,
     sha256: createHash('sha256').update(zip).digest('hex')
   });
+  await access('dist/site/404.html');
+  await access('dist/site/404.css');
+  await access('dist/site/staticwebapp.config.json');
 });
 
 test('extension build is packaged as MV3', async () => {

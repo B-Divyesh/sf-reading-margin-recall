@@ -41,11 +41,11 @@ npm run typecheck
 npm test
 npm run build
 npm run verify:deployment # checks the exact dist/site tree before upload
-npm run deploy:site       # Factory static deployment: uploads dist/site
+npm run deploy:site       # builds, uploads dist/site, then runs the live release gate
 npm run verify:live     # after deployment; checks build identity, ZIP, and branded HTTP 404
 ```
 
-`npm run build` builds the WXT extension, packages its zip, writes the static deployment to `dist/site`, and verifies that the exact deployment root contains the installer, matching build receipt, and product 404 configuration. `npm run deploy:site` deploys that directory, never its parent.
+`npm run build` and `npm run build:site` both build the WXT extension, package its zip, write the complete static deployment to `dist/site`, and verify that the exact deployment root contains the installer, matching build receipt, and product 404 configuration. The Vite-only step is private to the release assembler. `npm run deploy:site` deploys `dist/site`, never its parent, and fails unless the live release gate passes.
 `npm run verify:live` compares the deployed script, stylesheet, extension ZIP, and same-origin build receipt with that build. It also proves the live receipt names the pushed candidate commit, then checks the live HTTP 404, product headers, request privacy, and Axe results.
 
 ## Product behavior
