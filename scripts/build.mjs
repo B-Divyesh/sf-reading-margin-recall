@@ -30,3 +30,7 @@ await writeFile('dist/site/build-info.json', `${JSON.stringify({
     sha256: createHash('sha256').update(archive).digest('hex')
   }
 }, null, 2)}\n`);
+
+// Deployment must receive this directory itself, rather than its parent. Keep
+// the installer, release receipt, and product 404 together at that exact root.
+execFileSync('node', ['scripts/verify-deployment-tree.mjs'], { stdio: 'inherit' });

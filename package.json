@@ -9,6 +9,8 @@
     "build:site": "vite build --config vite.config.ts",
     "build:extension": "wxt build && wxt zip",
     "build": "node scripts/build.mjs",
+    "verify:deployment": "node scripts/verify-deployment-tree.mjs",
+    "deploy:site": "npm run build && /opt/fleet/lib/deploy-static.sh reading-margin-recall dist/site",
     "preview": "vite preview --config vite.config.ts --host 127.0.0.1",
     "test": "npm run build && playwright test",
     "verify:live": "node scripts/verify-live.mjs",

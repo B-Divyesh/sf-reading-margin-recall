@@ -1,6 +1,8 @@
 import { chromium, expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { access, readFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 for (const route of ['/', '/demo', '/library', '/review', '/privacy', '/terms', '/missing-page']) {
   test(`page quality ${route}`, async ({ page }) => {
@@ -117,6 +119,25 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   const built404 = await readFile('dist/site/404.html', 'utf8');
   expect(built404).toContain('<h1>We could not find this page</h1>');
   expect(built404).not.toMatch(/https?:\/\//);
+});
+
+test('@regression:deployment-content ships the installer and matching receipt at the exact deploy root', async () => {
+  const output = execFileSync('npm', ['run', 'verify:deployment'], { encoding: 'utf8' });
+  const report = JSON.parse(output.slice(output.indexOf('{'))) as {
+    siteRoot: string;
+    commit: string;
+    extension: { bytes: number; sha256: string; manifestVersion: number };
+    receipt: { commit: string; extension: { path: string; bytes: number; sha256: string } };
+  };
+  const zip = await readFile('dist/site/downloads/reading-margin-recall-chrome.zip');
+  expect(report.siteRoot).toBe(`${process.cwd()}/dist/site`);
+  expect(report.commit).toBe(report.receipt.commit);
+  expect(report.extension.manifestVersion).toBe(3);
+  expect(report.receipt.extension).toEqual({
+    path: '/downloads/reading-margin-recall-chrome.zip',
+    bytes: zip.byteLength,
+    sha256: createHash('sha256').update(zip).digest('hex')
+  });
 });
 
 test('extension build is packaged as MV3', async () => {
