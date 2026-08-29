@@ -47,4 +47,11 @@ The live checks use `https://reading-margin-recall.sociobot.in` and its named ro
 - `/opt/fleet/lib/verify-url.sh`: passed title, language, one h1, main, image alt, named controls, and console checks.
 - Initial bundles: 27,232-byte JS and 18,952-byte CSS; mobile hero image 25,872 bytes.
 
-Live deployment evidence is completed in `.factory/handoff.md` after the final deploy.
+## Live evidence
+
+- `npm run deploy:site` deployed verified product commit `ac861d960c29bf078d8ff3a3ade9a8a063d63474` and its exact assets.
+- `npm run verify:live` passed the build receipt, asset and ZIP hashes, HTTP 404, security headers, request privacy, offline flow, Axe, mobile layout, and 200% text checks.
+- A separate cold-browser pass rechecked both first-screen sizes, `?demo=1`, sample reveal/reset, history restoration, announcements, and an unknown HTTP 404.
+- Live Lighthouse: performance 100, accessibility 100, best practices 100, SEO 100; LCP 1.1 s, CLS 0, TBT 10 ms.
+- Cold live screenshots: `live-landing-mobile.png`, `live-landing-desktop.png`, `live-demo-mobile.png`, `live-demo-desktop.png`, and `live-404-desktop.png`.
+- The final documentation-only release is deployed again after this evidence commit. Its SHA is served at `/build-info.json` and checked against `origin/main` by `npm run verify:live`.

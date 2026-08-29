@@ -20,7 +20,7 @@ Export and import work in both directions, including import into an empty web co
 - `npm run typecheck`: passed.
 - `npm run build`: passed and produced `dist/site` plus the packaged extension ZIP.
 - `npm run verify:deployment`: passed.
-- Every `.factory/claims.json` command is rerun from a clean clone before release.
+- Every `.factory/claims.json` command passed separately in clean clone `/tmp/rmr-clean-RBbDCI` at `ac861d960c29bf078d8ff3a3ade9a8a063d63474`.
 - Playwright Axe found zero serious or critical issues across all routes, mobile routes, dark mode, the 404, and extension popup.
 - `verify-url.sh` passed with no console errors. Evidence: `.factory/evidence/polish-1/verify-url-local/verify.json`.
 - Lighthouse mobile-local: 100 performance, 100 accessibility, 100 best practices, and 100 SEO.
@@ -37,8 +37,26 @@ Screenshots:
 
 ## Live verification
 
-The final deployment is checked cold at the root, `/?demo=1`, `/library`, `/review`, `/privacy`, `/terms`, and an unknown URL.
-`npm run verify:live` verifies build identity, assets, ZIP, HTTP 404, security headers, request privacy, offline reload, Axe, mobile layout, and 200% text.
+`npm run deploy:site` deployed verified product commit `ac861d960c29bf078d8ff3a3ade9a8a063d63474` successfully.
+`npm run verify:live` passed build identity, assets, ZIP, HTTP 404, security headers, request privacy, offline reload, Axe, mobile layout, and 200% text.
+The live ZIP was 14,703 bytes with SHA-256 `c75da540070d98d9ab35fc0c78bddb95fff2b6313c76cc82a9515436d73434d9`.
+The live unknown route returned HTTP 404 with zero serious or critical Axe issues and zero third-party requests.
+A separate cold-browser pass rechecked the root, `/?demo=1`, history restoration, route announcements, and the complete 404 shell.
+Live Lighthouse scored 100 for performance, accessibility, best practices, and SEO.
+Its measured LCP was 1.1 s, CLS was 0, and total blocking time was 10 ms.
+
+Live evidence:
+
+- `.factory/evidence/polish-1/live-landing-mobile.png`
+- `.factory/evidence/polish-1/live-landing-desktop.png`
+- `.factory/evidence/polish-1/live-demo-mobile.png`
+- `.factory/evidence/polish-1/live-demo-desktop.png`
+- `.factory/evidence/polish-1/live-404-desktop.png`
+- `.factory/evidence/polish-1/verify-url-live/verify.json`
+- `.factory/evidence/polish-1/lighthouse-live.json`
+
+The final documentation-only commit is deployed after this handoff update.
+Its authoritative SHA is served at `/build-info.json` and compared with `origin/main` by `npm run verify:live`.
 
 ## Run and verify
 
