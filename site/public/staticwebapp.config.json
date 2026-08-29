@@ -11,6 +11,7 @@
     "404": { "rewrite": "/404.html", "statusCode": 404 }
   },
   "routes": [
+    { "route": "/", "rewrite": "/index.html" },
     { "route": "/demo", "rewrite": "/index.html" },
     { "route": "/library", "rewrite": "/index.html" },
     { "route": "/review", "rewrite": "/index.html" },

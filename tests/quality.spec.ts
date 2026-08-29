@@ -63,6 +63,7 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   expect(config.globalHeaders['X-Content-Type-Options']).toBe('nosniff');
   expect(config.globalHeaders['Referrer-Policy']).toBe('strict-origin-when-cross-origin');
   expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html', statusCode: 404 } });
+  expect(config.routes).toContainEqual({ route: '/', rewrite: '/index.html' });
   expect(config.routes).toContainEqual({ route: '/*', statusCode: 404 });
   await access('site/404.html');
   await access('site/public/404.css');
