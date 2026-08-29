@@ -15,7 +15,7 @@ Each part keeps its own local notes.
 Export a JSON backup from either part, then import it into the other.
 
 Reading notes and color settings stay in browser storage.
-Capture and review make no third-party requests.
+Capture, review, JSON export, and demo Reset or Exit make no third-party requests.
 The installed web app works offline after its first visit.
 The demo uses separate `demo:` storage and never touches real notes.
 

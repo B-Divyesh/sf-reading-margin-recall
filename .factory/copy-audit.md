@@ -60,6 +60,14 @@ Audited 2026-08-29. Counts treat hyphenated terms and contractions as one word. 
 | Built by Param Factory | 4 | Attribution |
 | v1.0.0 · Original generated field-guide artwork | 5 | Provenance |
 
+## Privacy and README wording checked in polish 3
+
+| Copy unit | Words | Result |
+| --- | ---: | --- |
+| Requests | 1 | Pass; privacy heading |
+| Capture, review, JSON export, and demo Reset or Exit make no third-party requests. | 13 | Pass; exact `local-only` claim in Privacy and README |
+| The extension saves only the text you select in its local note store. | 13 | Pass; exact `extension-selection` claim in Privacy |
+
 ## Terminology
 
 | Concept | One term used |

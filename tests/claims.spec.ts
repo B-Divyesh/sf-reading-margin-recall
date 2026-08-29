@@ -36,26 +36,48 @@ test('@claim:demo-isolated keeps real notes separate', async ({ page }) => {
   expect(stored.demo).toBeNull();
 });
 
-test('@claim:local-only keeps notes and color settings local with no tracking requests', async ({ page }) => {
+test('@claim:local-only keeps notes and color settings local with no third-party requests during capture, review, export, and demo actions', async ({ page }) => {
   const crossOrigin: string[] = [];
   page.on('request', (request) => { if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOrigin.push(request.url()); });
   await page.goto('/library');
   await page.getByRole('button', { name: 'Change color theme' }).click();
   expect(await page.evaluate(() => localStorage.getItem('rmr:theme'))).toBe('dark');
   expect(await page.evaluate(() => localStorage.getItem('demo:rmr:theme'))).toBeNull();
-  await page.goto('/demo');
-  await page.getByRole('button', { name: 'Change color theme' }).click();
-  expect(await page.evaluate(() => localStorage.getItem('demo:rmr:theme'))).toBe('dark');
-  expect(await page.evaluate(() => localStorage.getItem('rmr:theme'))).toBe('dark');
   await page.getByLabel('Selected passage *').fill('Je relis cette phrase demain.');
   await page.getByLabel('Your gloss *').fill('I reread this sentence tomorrow.');
   await page.getByLabel('Word to hide *').selectOption('demain');
   await page.getByLabel('Source title *').fill('Private article');
   await page.getByLabel('Source URL *').fill('https://example.com/private');
   await page.getByRole('button', { name: 'Save review note' }).click();
-  const storage = await page.evaluate(() => ({ demoNotes: localStorage.getItem('demo:rmr:notes'), realNotes: localStorage.getItem('rmr:notes') }));
-  expect(storage.demoNotes).toContain('Je relis cette phrase demain.');
-  expect(storage.realNotes).toBeNull();
+  await page.goto('/review');
+  await page.keyboard.press('Space');
+  await expect(page.getByText('Hidden word:')).toBeVisible();
+  await page.keyboard.press('3');
+  await page.goto('/library');
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export JSON' }).click();
+  const download = await downloadPromise;
+  expect(await download.suggestedFilename()).toMatch(/^reading-margin-recall-\d{4}-\d{2}-\d{2}\.json$/);
+  await page.goto('/demo');
+  await page.getByRole('button', { name: 'Change color theme' }).click();
+  expect(await page.evaluate(() => localStorage.getItem('demo:rmr:theme'))).toBe('dark');
+  expect(await page.evaluate(() => localStorage.getItem('rmr:theme'))).toBe('dark');
+  await page.getByRole('button', { name: 'Reset demo' }).click();
+  expect(await page.evaluate(() => localStorage.getItem('demo:rmr:notes'))).toContain('La vie est une fleur');
+  await page.getByRole('button', { name: 'Exit demo and use my notes' }).click();
+  await expect(page).toHaveURL('/library');
+  const storage = await page.evaluate(() => ({
+    demoNotes: localStorage.getItem('demo:rmr:notes'),
+    demoTheme: localStorage.getItem('demo:rmr:theme'),
+    realNotes: localStorage.getItem('rmr:notes'),
+    realTheme: localStorage.getItem('rmr:theme')
+  }));
+  expect(storage.demoNotes).toBeNull();
+  expect(storage.demoTheme).toBeNull();
+  expect(storage.realNotes).toContain('Je relis cette phrase demain.');
+  expect(storage.realTheme).toBe('dark');
+  await page.goto('/privacy');
+  await expect(page.getByText('Capture, review, JSON export, and demo Reset or Exit make no third-party requests.')).toBeVisible();
   expect(crossOrigin).toEqual([]);
 });
 

@@ -295,6 +295,17 @@ test('@claim:extension-selection captures only selected page text', async ({}, t
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${extensionId}/popup.html`);
     await expect(popup.getByRole('heading', { name: 'Recall the missing word' })).toBeVisible();
+    const saved = await popup.evaluate(async () => {
+      const extensionApi = (globalThis as typeof globalThis & {
+        chrome: { storage: { local: { get(key: string): Promise<Record<string, unknown>> } } };
+      }).chrome;
+      return (await extensionApi.storage.local.get('rmr:notes'))['rmr:notes'] as Array<{ passage: string; gloss: string }>;
+    });
+    expect(saved).toHaveLength(1);
+    expect(saved[0]).toEqual(expect.objectContaining({
+      passage: 'For language learners who want selected sentences to become source-linked review notes.',
+      gloss: 'A short explanation in my words.'
+    }));
     const popupAxe = await new AxeBuilder({ page: popup as never }).analyze();
     expect(popupAxe.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
     await popup.keyboard.press('Space');

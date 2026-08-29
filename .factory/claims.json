@@ -8,7 +8,7 @@
   },
   {
     "id": "extension-selection",
-    "claim": "The extension captures only selected text into its own local store.",
+    "claim": "The extension saves only the text you select in its local note store.",
     "where": "landing privacy section, README",
     "test": "npm test -- --grep @claim:extension-selection",
     "sandbox": "fresh Chromium profile with the built extension; select one sentence, assert the capture dialog contains only that sentence, then save"
@@ -22,10 +22,10 @@
   },
   {
     "id": "local-only",
-    "claim": "Reading notes and color settings stay in browser storage with no tracking requests.",
+    "claim": "Reading notes and color settings stay in browser storage. Capture, review, JSON export, and demo Reset or Exit make no third-party requests.",
     "where": "landing facts, privacy page, README",
     "test": "npm test -- --grep @claim:local-only",
-    "sandbox": "fresh real and demo contexts; change each color setting, complete a capture flow, assert the correct localStorage namespace, and record only same-origin requests"
+    "sandbox": "fresh real and demo contexts; change each color setting, capture and grade a note, export JSON, reset and exit the demo, assert the correct localStorage namespaces, and record only same-origin requests"
   },
   {
     "id": "pwa-installable",
