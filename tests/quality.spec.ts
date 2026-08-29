@@ -51,6 +51,7 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   const config = JSON.parse(await readFile('site/public/staticwebapp.config.json', 'utf8')) as {
     globalHeaders: Record<string, string>;
     navigationFallback: { exclude: string[] };
+    responseOverrides: Record<string, { rewrite: string; statusCode: number }>;
   };
   const csp = config.globalHeaders['Content-Security-Policy'];
   expect(csp).toContain("default-src 'self'");
@@ -60,6 +61,9 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   expect(config.navigationFallback.exclude).toContain('/downloads/*');
   expect(config.globalHeaders['X-Content-Type-Options']).toBe('nosniff');
   expect(config.globalHeaders['Referrer-Policy']).toBe('strict-origin-when-cross-origin');
+  expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html', statusCode: 404 } });
+  await access('site/404.html');
+  await access('site/public/404.css');
 });
 
 test('extension build is packaged as MV3', async () => {
@@ -90,6 +94,7 @@ test('@claim:extension-selection captures only selected page text', async ({}, t
       document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
     });
     const root = page.locator('#reading-margin-recall-root');
+    expect((await root.locator('.capture-chip').boundingBox())?.height).toBeGreaterThanOrEqual(44);
     await root.locator('.capture-chip').click();
     await expect(root.locator('#rmr-passage')).toHaveText('For language learners who want selected sentences to become source-linked review notes.');
     await root.locator('#rmr-gloss').fill('A short explanation in my words.');

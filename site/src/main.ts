@@ -1,5 +1,5 @@
 import './styles.css';
-import { DEMO_NOTES, clozePassage, deletionChoices, gradeNote, isHttpUrl, makeNote, type ReadingNote, type RecallGrade } from '../../shared/model';
+import { DEMO_NOTES, clozePassage, deletionChoices, gradeNote, isHttpUrl, isReadingNote, isStoredReadingNote, makeNote, type ReadingNote, type RecallGrade } from '../../shared/model';
 
 const PRODUCT = 'Reading Margin Recall';
 const SITE = 'https://reading-margin-recall.sociobot.in';
@@ -7,6 +7,7 @@ const app = document.querySelector<HTMLDivElement>('#app')!;
 let demoMode = location.pathname === '/demo' || new URLSearchParams(location.search).get('demo') === '1';
 let lastDeleted: ReadingNote | null = null;
 let revealAnswer = false;
+let storageWarning = '';
 
 const e = (value: string) => value.replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]!);
 const notesKey = () => demoMode ? 'demo:rmr:notes' : 'rmr:notes';
@@ -19,18 +20,24 @@ function readNotes(): ReadingNote[] {
       localStorage.setItem(notesKey(), JSON.stringify(DEMO_NOTES));
       return structuredClone(DEMO_NOTES);
     }
-    return raw ? JSON.parse(raw) as ReadingNote[] : [];
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) throw new Error('notes are not an array');
+    const notes = parsed.filter(isStoredReadingNote);
+    if (notes.length !== parsed.length) storageWarning = 'Some incomplete saved notes were ignored. Import a valid backup to restore them.';
+    return notes;
   } catch {
-    announce('Notes could not be read. Check this browser’s storage settings.');
+    storageWarning = 'Saved notes could not be read. Check browser storage or import a valid backup.';
     return [];
   }
 }
 
-function saveNotes(notes: ReadingNote[]) {
+function saveNotes(notes: ReadingNote[]): boolean {
   try {
     localStorage.setItem(notesKey(), JSON.stringify(notes));
+    return true;
   } catch {
-    announce('The note was not saved because browser storage is unavailable.');
+    return false;
   }
 }
 
@@ -96,8 +103,10 @@ function noteList(notes: ReadingNote[]): string {
 }
 
 function library(): string {
+  storageWarning = '';
   const notes = readNotes();
-  return shell(`<section class="app-intro section-pad"><p class="eyebrow">Your private margin</p><h1>${demoMode ? 'Explore saved sample passages' : 'Save a passage for later recall'}</h1><p>${demoMode ? 'These three sample notes use a separate demo store.' : 'Paste a selected sentence, explain it in your words, then hide one word.'}</p></section><section class="workbench section-pad"><div class="margin-label">New specimen</div>${captureForm(notes)}</section><div class="section-pad">${noteList(notes)}</div>`);
+  const warning = storageWarning ? `<p class="storage-warning" role="status">${e(storageWarning)}</p>` : '';
+  return shell(`<section class="app-intro section-pad"><p class="eyebrow">Your private margin</p><h1>${demoMode ? 'Explore saved sample passages' : 'Save a passage for later recall'}</h1><p>${demoMode ? 'These three sample notes use a separate demo store.' : 'Paste a selected sentence, explain it in your words, then hide one word.'}</p>${warning}</section><section class="workbench section-pad"><div class="margin-label">New specimen</div>${captureForm(notes)}</section><div class="section-pad">${noteList(notes)}</div>`);
 }
 
 function review(): string {
@@ -209,31 +218,49 @@ function captureNote(event: SubmitEvent) {
   event.preventDefault();
   const form = event.currentTarget as HTMLFormElement;
   const data = new FormData(form);
-  const input = Object.fromEntries(['passage', 'gloss', 'deletion', 'sourceUrl', 'sourceTitle'].map((key) => [key, String(data.get(key) ?? '').trim()])) as Record<string, string>;
+  const input: Pick<ReadingNote, 'passage' | 'gloss' | 'deletion' | 'sourceUrl' | 'sourceTitle'> = {
+    passage: String(data.get('passage') ?? '').trim(),
+    gloss: String(data.get('gloss') ?? '').trim(),
+    deletion: String(data.get('deletion') ?? '').trim(),
+    sourceUrl: String(data.get('sourceUrl') ?? '').trim(),
+    sourceTitle: String(data.get('sourceTitle') ?? '').trim()
+  };
   const error = document.querySelector<HTMLElement>('#capture-error')!;
   if (Object.values(input).some((value) => !value)) { error.textContent = 'The note is missing a field. Fill each marked field, then save again.'; return; }
   if (!input.passage.toLocaleLowerCase().includes(input.deletion.toLocaleLowerCase())) { error.textContent = 'The hidden word is not in the passage. Choose a listed word.'; return; }
   if (!isHttpUrl(input.sourceUrl)) { error.textContent = 'The source link must start with http:// or https://. Paste the full web address.'; return; }
   const notes = readNotes();
   notes.unshift(makeNote(input as Pick<ReadingNote, 'passage' | 'gloss' | 'deletion' | 'sourceUrl' | 'sourceTitle'>));
-  saveNotes(notes); form.reset(); render(); announce('Review note saved.');
+  if (!saveNotes(notes)) {
+    error.textContent = 'The note was not saved because browser storage is unavailable. Your text is still here; free space, then save again.';
+    announce('The note was not saved because browser storage is unavailable.');
+    return;
+  }
+  form.reset(); render(); announce('Review note saved.');
 }
 
 function deleteNote(id: string) {
   const notes = readNotes();
   const note = notes.find((item) => item.id === id);
   if (!note || !confirm(`Delete the note from “${note.sourceTitle}”?`)) return;
-  lastDeleted = note; saveNotes(notes.filter((item) => item.id !== id)); render();
+  if (!saveNotes(notes.filter((item) => item.id !== id))) { announce('The note was not deleted because browser storage is unavailable.'); return; }
+  lastDeleted = note; render();
   const toast = document.querySelector<HTMLElement>('#toast')!;
   toast.innerHTML = `Note deleted. <button class="text-button" data-action="undo">Undo</button>`;
   toast.classList.add('show');
-  toast.querySelector('button')?.addEventListener('click', () => { if (lastDeleted) { const current = readNotes(); current.unshift(lastDeleted); saveNotes(current); lastDeleted = null; render(); announce('Note restored.'); } });
+  toast.querySelector('button')?.addEventListener('click', () => {
+    if (!lastDeleted) return;
+    const current = readNotes(); current.unshift(lastDeleted);
+    if (!saveNotes(current)) { announce('The note was not restored because browser storage is unavailable.'); return; }
+    lastDeleted = null; render(); announce('Note restored.');
+  });
 }
 
 function submitGrade(grade: RecallGrade) {
   const id = document.querySelector<HTMLElement>('[data-note-id]')?.dataset.noteId;
   const notes = readNotes().map((note) => note.id === id ? gradeNote(note, grade) : note);
-  saveNotes(notes); revealAnswer = false; render(); announce('Review saved. The next note is ready.');
+  if (!saveNotes(notes)) { announce('The review was not saved because browser storage is unavailable.'); return; }
+  revealAnswer = false; render(); announce('Review saved. The next note is ready.');
 }
 
 function exportNotes() {
@@ -246,12 +273,14 @@ function exportNotes() {
 async function importNotes(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]; if (!file) return;
   try {
-    const parsed = JSON.parse(await file.text()) as { notes?: ReadingNote[] };
-    if (!Array.isArray(parsed.notes)) throw new Error('missing notes');
-    const safeNotes = parsed.notes.filter((note): note is ReadingNote => typeof note === 'object' && note !== null && isHttpUrl((note as ReadingNote).sourceUrl));
-    if (!safeNotes.length && parsed.notes.length) throw new Error('no safe source URLs');
-    saveNotes(safeNotes); render(); announce(`${safeNotes.length} notes imported.`);
-  } catch { announce('That file could not be imported. Choose a Reading Margin Recall JSON backup.'); }
+    const parsed = JSON.parse(await file.text()) as { version?: unknown; notes?: unknown };
+    if (parsed.version !== 1 || !Array.isArray(parsed.notes) || !parsed.notes.every(isReadingNote)) throw new Error('invalid backup');
+    if (!saveNotes(parsed.notes)) {
+      announce('The backup was not imported because browser storage is unavailable. Existing notes were not changed.');
+      return;
+    }
+    render(); announce(`${parsed.notes.length} notes imported.`);
+  } catch { announce('That file could not be imported. No notes were changed. Choose a complete Reading Margin Recall JSON backup.'); }
 }
 
 function setConnectionState() {

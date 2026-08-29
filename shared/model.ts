@@ -28,6 +28,28 @@ export function isHttpUrl(value: string): boolean {
   }
 }
 
+/**
+ * Backups are user-controlled input, even when they originated in an older
+ * version of this app. Keep the complete shape check in one place so a bad
+ * record can never reach a renderer or the review scheduler.
+ */
+export function isStoredReadingNote(value: unknown): value is ReadingNote {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const note = value as Record<string, unknown>;
+  const textFields = ['id', 'passage', 'gloss', 'deletion', 'sourceUrl', 'sourceTitle', 'createdAt', 'dueAt'];
+  if (textFields.some((field) => typeof note[field] !== 'string' || !(note[field] as string).trim())) return false;
+  if (!(note.passage as string).toLocaleLowerCase().includes((note.deletion as string).toLocaleLowerCase())) return false;
+  if (!Number.isSafeInteger(note.reviews) || (note.reviews as number) < 0) return false;
+  if (typeof note.intervalDays !== 'number' || !Number.isFinite(note.intervalDays) || (note.intervalDays as number) < 0) return false;
+  if (Number.isNaN(Date.parse(note.createdAt as string)) || Number.isNaN(Date.parse(note.dueAt as string))) return false;
+  return note.lastGrade === undefined || note.lastGrade === 1 || note.lastGrade === 2 || note.lastGrade === 3 || note.lastGrade === 4;
+}
+
+/** A backup may only introduce web links; legacy local notes remain safe to display without a link. */
+export function isReadingNote(value: unknown): value is ReadingNote {
+  return isStoredReadingNote(value) && isHttpUrl(value.sourceUrl);
+}
+
 export function makeNote(input: Pick<ReadingNote, 'passage' | 'gloss' | 'deletion' | 'sourceUrl' | 'sourceTitle'>): ReadingNote {
   const now = new Date();
   return {
@@ -92,7 +114,7 @@ export const DEMO_NOTES: ReadingNote[] = [
     passage: 'En un lugar de la Mancha, de cuyo nombre no quiero acordarme.',
     gloss: 'In a place in La Mancha, whose name I do not wish to recall.',
     deletion: 'acordarme',
-    sourceUrl: 'https://es.wikisource.org/wiki/Don_Quijote_de_la_Mancha:_Cap%C3%ADtulo_I',
+    sourceUrl: 'https://es.wikisource.org/wiki/Don_Quijote_de_la_Mancha',
     sourceTitle: 'Don Quijote de la Mancha, capítulo I',
     createdAt: '2026-08-27T18:15:00.000Z',
     dueAt: '2026-08-28T18:15:00.000Z',

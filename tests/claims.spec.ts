@@ -120,3 +120,49 @@ test('@claim:http-source-links @regression:source-url-scheme rejects non-web URL
   await expect(page.getByText('Source link unavailable')).toBeVisible();
   await expect(page.locator('a[href^="javascript:"]')).toHaveCount(0);
 });
+
+test('@regression:incomplete-import-is-atomic rejects a structurally incomplete backup without poisoning saved notes', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/demo');
+  const before = await page.evaluate(() => localStorage.getItem('demo:rmr:notes'));
+  await page.getByLabel('Import JSON').setInputFiles({
+    name: 'incomplete-backup.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify({ version: 1, notes: [{ sourceUrl: 'https://example.com' }] }))
+  });
+  await expect(page.locator('#announcer')).toHaveText('That file could not be imported. No notes were changed. Choose a complete Reading Margin Recall JSON backup.');
+  expect(await page.evaluate(() => localStorage.getItem('demo:rmr:notes'))).toBe(before);
+  await page.reload();
+  await expect(page.getByText('3 saved passages')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('@regression:storage-write-failure-keeps-capture-form-and-never-announces-success', async ({ page }) => {
+  await page.goto('/library');
+  await page.getByLabel('Selected passage *').fill('La memoria vuelve cuando leo despacio.');
+  await page.getByLabel('Your gloss *').fill('Memory returns when I read slowly.');
+  await page.getByLabel('Word to hide *').selectOption('memoria');
+  await page.getByLabel('Source title *').fill('Storage boundary');
+  await page.getByLabel('Source URL *').fill('https://example.com/storage-boundary');
+  await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(key: string, value: string) {
+      if (key === 'rmr:notes') throw new DOMException('Storage full', 'QuotaExceededError');
+      return original.call(this, key, value);
+    };
+  });
+  await page.getByRole('button', { name: 'Save review note' }).click();
+  await expect(page.getByRole('alert')).toHaveText('The note was not saved because browser storage is unavailable. Your text is still here; free space, then save again.');
+  await expect(page.getByLabel('Selected passage *')).toHaveValue('La memoria vuelve cuando leo despacio.');
+  await expect(page.locator('#announcer')).toHaveText('The note was not saved because browser storage is unavailable.');
+  expect(await page.evaluate(() => localStorage.getItem('rmr:notes'))).toBeNull();
+});
+
+test('@regression:demo-source-return-link-is-live', async ({ page, request }) => {
+  await page.goto('/demo');
+  const href = await page.getByRole('link', { name: /Open source Don Quijote de la Mancha, capítulo I/ }).getAttribute('href');
+  expect(href).toBe('https://es.wikisource.org/wiki/Don_Quijote_de_la_Mancha');
+  const source = await request.get(href!);
+  expect(source.status()).toBe(200);
+});

@@ -18,7 +18,7 @@ export default defineContentScript({
       button, input, textarea, select { font: 16px/1.4 ui-sans-serif, system-ui, sans-serif; }
       button { cursor: pointer; min-height: 44px; }
       button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid #d79a2b; outline-offset: 3px; }
-      .capture-chip { position: fixed; z-index: 2147483646; display: none; min-height: 42px; padding: 8px 13px; border: 0; border-radius: 4px 18px 4px 4px; box-shadow: 0 8px 28px rgba(16,37,29,.28); background: #18362b; color: #f4f0e4; font-weight: 800; }
+      .capture-chip { position: fixed; z-index: 2147483646; display: none; min-height: 44px; padding: 8px 13px; border: 0; border-radius: 4px 18px 4px 4px; box-shadow: 0 8px 28px rgba(16,37,29,.28); background: #18362b; color: #f4f0e4; font-weight: 800; }
       .capture-chip.visible { display: block; }
       dialog { width: min(520px, calc(100vw - 24px)); max-height: calc(100vh - 24px); margin: auto; padding: 0; border: 1px solid #50635a; border-radius: 3px 28px 3px 3px; box-shadow: 0 24px 80px rgba(16,37,29,.35); background: #f4f0e4; color: #18362b; font: 16px/1.5 ui-sans-serif, system-ui, sans-serif; overflow: auto; }
       dialog::backdrop { background: rgba(16,37,29,.52); }

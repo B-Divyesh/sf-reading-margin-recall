@@ -152,6 +152,7 @@ mark { padding: 0 .12em; background: color-mix(in srgb, var(--pollen) 35%, trans
 .field input, .field textarea, .field select { width: 100%; padding: 10px 12px; border: 1px solid var(--ink-soft); border-radius: 2px; background: var(--paper); }
 .capture-form .button { justify-self: start; }
 .form-error { align-self: center; margin: 0; color: var(--berry); font-weight: 700; }
+.storage-warning { margin: 24px 0 0; padding: 12px 16px; border-left: 4px solid var(--berry); background: var(--paper-deep); color: var(--ink); font-weight: 700; }
 .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 40px; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
 .quiet-button, .text-button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--ink-soft); background: transparent; font-weight: 700; }
