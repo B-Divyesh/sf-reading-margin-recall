@@ -22,7 +22,7 @@ On 2026-08-29, fresh production requests reproduced the controller evidence exac
 - Bumped the service-worker cache to `reading-margin-recall-v6` so existing installs update to the repaired shell.
 - Added exact regression coverage that deletes `dist/site`, runs only `npm run build:site`, and requires the ZIP, receipt, 404, stylesheet, and policy at the deploy root.
 - Added a seven-route 390 px regression audit for target size, text size, overflow, and serious/critical Axe results. The same audit is part of `npm run verify:live`.
-- Extended the live gate to require the product 404, no third-party requests, no console errors, security/cache headers, `X-Robots-Tag: noindex`, a byte-identical ZIP, and a matching candidate receipt.
+- Extended the live gate to require the product 404 and its noindex directive, no third-party requests, no console errors, security/cache headers, a byte-identical ZIP, and a matching candidate receipt.
 
 ## Verification evidence
 
@@ -39,6 +39,14 @@ Clean local release checks on 2026-08-29:
 - Local `verify-url.sh`: 200 in 557 ms; no console errors; title, `lang=en`, one h1, main, image alt text, and button names pass.
 - Lighthouse mobile: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 1.0 s, LCP 1.4 s, TBT 40 ms, CLS 0.
 - Production sizes: JS 24,536 bytes (8,850 gzip), CSS 16,764 bytes (4,480 gzip), mobile hero 25,872 bytes, desktop hero 109,412 bytes.
+
+Production verification of repair commit `95d130fb2593ed468776c4424df612c041ce772a`:
+
+- Azure deployment `4330c006-1892-4f2f-9493-2365de18fa18` uploaded the complete 336,593-byte `dist/site` artifact.
+- `/build-info.json`: HTTP 200, `application/json`, `no-store`, and the expected commit and extension digest.
+- `/downloads/reading-margin-recall-chrome.zip`: HTTP 200, `application/zip`, 13,734 bytes, SHA-256 `ff977804d0ceebf1adbf93be8b0865ea9ef9d4675506456643e7287de578b6d0`.
+- A fresh unknown URL: HTTP 404 with the 958-byte product document, CSP, HSTS, nosniff, referrer policy, 30-second revalidation, no third-party requests, no console errors, and zero serious/critical Axe findings.
+- `npm run verify:live`: pass for byte-identical site assets and service worker; candidate identity; desktop capture/review/keyboard flow; offline reload/update; seven-route 390 px target/text/overflow/Axe audit; 200% text; and request privacy.
 
 ## Run and verify
 
