@@ -1,4 +1,27 @@
-# Handoff — verification 6 release repair
+# Handoff — verification 7 independent QA PASS
+
+## Release decision
+
+**PASS — candidate `47e669cdb764d5fbeec7dccc6e5c2e510418b8d3` is accepted for release at https://reading-margin-recall.sociobot.in.**
+
+Independent QA on 2026-08-29 reran all 11 claim tests, the full 46-test Playwright suite, typecheck, production build, deploy-tree check, security audits, and the candidate-specific live verifier. All passed.
+
+The live build receipt identifies this exact commit. The public MV3 installer is HTTP 200 `application/zip`, 13,734 bytes, SHA-256 `ff977804d0ceebf1adbf93be8b0865ea9ef9d4675506456643e7287de578b6d0`. The deployed PWA also passed capture/review, invalid URL recovery, privacy request logging, keyboard, demo isolation, 390 px/mobile, Axe, reduced-motion, service-worker update, and offline reload checks. No release defects remain.
+
+For exact evidence, tested URL/commit, claim results, and severity table, see `.factory/verification-7.md`.
+
+## Reproduce this verification
+
+```sh
+npm ci
+npm test
+npm run typecheck
+npm run build
+npm run verify:deployment
+RMR_CANDIDATE_SHA=47e669cdb764d5fbeec7dccc6e5c2e510418b8d3 npm run verify:live
+```
+
+## Historical repair notes
 
 ## Outcome
 
