@@ -1,4 +1,18 @@
-# Handoff — polish round 3 retry 1
+# Handoff — verification 10
+
+## Current independent verdict
+
+**PASS — candidate `f68aabd6dfa0c3e3cd7c7ac55a1d3431265500c1` is accepted for release.**
+
+Independent verification on 2026-08-29 ran all 14 declared claim commands separately (all passed), then `npm test` (53 passed, 2 intentional skips), `npm run typecheck`, `npm run build`, and `npm run verify:deployment` (all passed). The live URL <https://reading-margin-recall.sociobot.in> byte-matches the candidate HTML, worker, manifest, hashed JS/CSS, hero, ZIP, and `build-info.json`; the live receipt identifies the same commit and extension SHA-256 `2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047`.
+
+The cold screen clearly tells language learners what it does and exposes the one-click isolated sample demo. Live capture validation/recovery, keyboard review, 390px mobile, visible skip-link focus, reduced motion, offline reload, same-origin request logging, response headers, caching, bundle budgets, and Axe checks passed. No P0–P3 defects or known product gaps remain. There is no backend/API, account, billing, analytics, or AI runtime; rate-limit and Entra checks are not applicable.
+
+Fresh Lighthouse 13.4.1 could not collect because the preinstalled Playwright Chromium crashed inside Lighthouse. This did not affect the product’s own browser checks; no score is claimed from an earlier run. See `.factory/verification-10.md` for the full exact evidence and reproduction steps.
+
+---
+
+# Previous builder handoff — polish round 3 retry 1
 
 ## Outcome
 
