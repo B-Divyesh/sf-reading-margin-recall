@@ -44,6 +44,10 @@ The repair preserves the botanical field-guide interface. It closes the last two
 - Local production checks: `npm test` passed 53 browser tests with 2 intentional mobile-project skips; `npm run typecheck` and `npm run verify:deployment` passed; `npm audit --omit=dev` reported zero vulnerabilities.
 - Local visual checks: `local-home-desktop.png`, `local-demo-mobile.png`, `local-privacy-desktop.png`, and `local-404-desktop.png` were captured from the production preview. The 390 px demo view visibly contains the sample, banner, Reset, Exit, and Reveal action without scrolling.
 
-## Deployment follow-up
+## Deployed evidence
 
-After deploying, this record is supplemented with cold live screenshots and the live verification result in `.factory/handoff.md`.
+- Deployment through `npm run deploy:site` succeeded. The live build receipt, HTML, hashed CSS/JS, worker, and 14,726-byte MV3 ZIP all byte-match candidate `6d163ef244e26780c9fd8a54b03dbcd47d229add`; see `verify-live.json`.
+- Cold public screenshots are `live-home-desktop.png`, `live-demo-mobile.png`, `live-privacy-desktop.png`, and `live-404-desktop.png`. They were visually checked after deployment. The demo mobile capture shows the persistent isolation banner and the Reveal action inside the first 390×844 viewport; the Privacy capture shows both exact repaired claims.
+- `verify-url-live/verify.json` passed with a 613 ms cold load, zero browser errors, `lang=en`, one h1, one main landmark, image alt coverage, and named buttons.
+- Live Lighthouse 12.8.2 mobile results in `lighthouse-live.json`: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 908 ms, LCP 1,058 ms, TBT 5 ms, CLS 0.
+- The live verifier rechecked the real 404, header policy, extension ZIP, capture/review/keyboard path, offline reload, current service worker, no third-party requests, 44 px targets, 16 px mobile text, 200% text resize, reduced motion, and Axe on all seven mobile routes. No finding remained.

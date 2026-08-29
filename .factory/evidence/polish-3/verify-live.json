@@ -1,0 +1,42 @@
+{
+  "base": "https://reading-margin-recall.sociobot.in/",
+  "candidate": "6d163ef244e26780c9fd8a54b03dbcd47d229add",
+  "buildReceipt": {
+    "commit": "6d163ef244e26780c9fd8a54b03dbcd47d229add",
+    "extension": {
+      "path": "/downloads/reading-margin-recall-chrome.zip",
+      "bytes": 14726,
+      "sha256": "2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047"
+    }
+  },
+  "assets": [
+    "/assets/index-D3IiaDfU.js",
+    "/assets/index-BVRRlIF0.css"
+  ],
+  "extension": {
+    "bytes": 14726,
+    "sha256": "2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047",
+    "contentType": "application/zip"
+  },
+  "notFound": {
+    "status": 404,
+    "cacheControl": "public, must-revalidate, max-age=30",
+    "axeSeriousOrCritical": 0,
+    "thirdPartyRequests": 0
+  },
+  "productFlow": {
+    "desktopCaptureReview": "passed",
+    "keyboard": "passed",
+    "offlineReload": "passed",
+    "serviceWorkerUpdate": "passed",
+    "thirdPartyRequests": 0
+  },
+  "mobile": {
+    "viewport": "390x844",
+    "routes": 7,
+    "minimumTarget": "44x44",
+    "minimumText": "16px",
+    "textResize": "200%",
+    "axeSeriousOrCritical": 0
+  }
+}
