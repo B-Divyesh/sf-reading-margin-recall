@@ -55,4 +55,6 @@ All review 1–3 findings remain closed. This retry also fixes the controller’
 
 ## Deployment verification
 
-The final deployment receipt, live verifier result, screenshots, and Lighthouse result are recorded in `.factory/handoff.md`. Cold checks cover the home first screen, isolated demo, Privacy, real HTTP 404, extension ZIP, offline reload, keyboard review, request privacy, reduced motion, text resizing, touch targets, and Axe on every route.
+Candidate `d556c48356687e29d2973dee4310efe351823f5c` was pushed and deployed through `npm run deploy:site`. The build receipt and HTML, JS, CSS, service worker, and 14,726-byte extension ZIP byte-matched. `npm run verify:live` passed the real 404, offline reload, keyboard review, request privacy, reduced motion, text resizing, touch targets, and Axe on seven routes.
+
+The live URL verifier reported an 830 ms load with zero errors. Live Lighthouse scored 100 in Performance, Accessibility, Best Practices, and SEO, with 1,052 ms LCP and zero CLS. Cold screenshots are `live-home-desktop.png`, `live-demo-mobile.png`, `live-privacy-desktop.png`, and `live-404-desktop.png`.
