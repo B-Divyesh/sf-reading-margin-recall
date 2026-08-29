@@ -51,7 +51,7 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   const config = JSON.parse(await readFile('site/public/staticwebapp.config.json', 'utf8')) as {
     globalHeaders: Record<string, string>;
     navigationFallback: { exclude: string[] };
-    responseOverrides: Record<string, { rewrite: string; statusCode: number }>;
+    responseOverrides: Record<string, { rewrite: string }>;
     routes: Array<{ route: string; statusCode?: number; rewrite?: string }>;
   };
   const csp = config.globalHeaders['Content-Security-Policy'];
@@ -62,7 +62,7 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   expect(config.navigationFallback.exclude).toContain('/downloads/*');
   expect(config.globalHeaders['X-Content-Type-Options']).toBe('nosniff');
   expect(config.globalHeaders['Referrer-Policy']).toBe('strict-origin-when-cross-origin');
-  expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html', statusCode: 404 } });
+  expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html' } });
   expect(config.routes).toContainEqual({ route: '/', rewrite: '/index.html' });
   expect(config.routes).toContainEqual({ route: '/*', statusCode: 404 });
   await access('site/404.html');
