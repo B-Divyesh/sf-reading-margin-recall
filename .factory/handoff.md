@@ -1,37 +1,55 @@
-# Handoff — adversarial first-read review 1
+# Handoff — polish round 1
 
 ## Outcome
 
-**FAIL.** The independent review is in `.factory/review-1.md`. No product code was changed.
+All F-1-1 through F-1-23 findings in `.factory/review-1.md` are fixed. There were no earlier review or polish files.
+The browser-extension artifact and static deployment model are unchanged.
+The botanical field-guide identity, palette, type, illustration, and motion remain intact.
 
-The first screen clearly states the job, audience, and primary action. The release still fails because `/demo` places all realistic sample records below an empty capture form, so neither the 390 × 844 nor 1440 × 900 first viewport shows the product in use. The review also records missing extension/PWA data transfer, incomplete history behavior and 404 structure, unlisted claims, and plain-language defects.
+The canonical one-click sample entry is `https://reading-margin-recall.sociobot.in/?demo=1`.
+It shows an actionable sample review in the first 390×844 screen.
+The banner exposes Reset demo and Exit demo and use my notes.
+Demo data remains under `demo:` keys and never enters the real note namespace.
 
-## Verification performed
+The extension and web app now exchange the same validated JSON backup.
+Export and import work in both directions, including import into an empty web collection.
 
-- Opened the live site in fresh 390 × 844 and 1440 × 900 Chromium contexts before scrolling.
-- Exercised the live demo, Reset demo, Start for real, seeded-real-data isolation, and same-origin request logging.
-- Ran all 11 exact `.factory/claims.json` commands separately after `npm ci` in a clean clone; all passed.
-- Ran the complete pinned suite in that clone: 44 passed, 2 intentional mobile duplicates skipped.
-- Ran `npm run typecheck` and `npm run verify:deployment`; both passed after the production build.
-- Ran `/opt/fleet/lib/verify-url.sh` against the live root; it passed with no console errors.
-- Used the repository’s Playwright/Axe checks after the standalone Axe CLI selected an incompatible ChromeDriver; all serious/critical Axe checks passed.
-- Crawled every discovered product, download, sample-source, and factory link; all returned 200 after redirects.
-- Checked titles, h1 count, metadata, canonical URLs, 404 response/headers, deep links, Back/Forward behavior, focus, mobile targets/text, reduced motion, request privacy, and bundle size.
-- Read the brief, design thesis, claims, demo notes, copy audit, README, prior handoff, and referenced prior verification findings.
+## Local verification
 
-## Reproduce
+- `npm test`: 52 passed; 2 intentional mobile duplicates skipped.
+- `npm run typecheck`: passed.
+- `npm run build`: passed and produced `dist/site` plus the packaged extension ZIP.
+- `npm run verify:deployment`: passed.
+- Every `.factory/claims.json` command is rerun from a clean clone before release.
+- Playwright Axe found zero serious or critical issues across all routes, mobile routes, dark mode, the 404, and extension popup.
+- `verify-url.sh` passed with no console errors. Evidence: `.factory/evidence/polish-1/verify-url-local/verify.json`.
+- Lighthouse mobile-local: 100 performance, 100 accessibility, 100 best practices, and 100 SEO.
+- Lighthouse metrics: 1.5 s LCP, 0 CLS, and 30 ms total blocking time.
+- Initial bundles: 27,232-byte JavaScript and 18,952-byte CSS. The mobile hero is 25,872 bytes.
+
+Screenshots:
+
+- `.factory/evidence/polish-1/landing-mobile.png`
+- `.factory/evidence/polish-1/landing-desktop.png`
+- `.factory/evidence/polish-1/demo-mobile.png`
+- `.factory/evidence/polish-1/demo-desktop.png`
+- `.factory/evidence/polish-1/404-desktop.png`
+
+## Live verification
+
+The final deployment is checked cold at the root, `/?demo=1`, `/library`, `/review`, `/privacy`, `/terms`, and an unknown URL.
+`npm run verify:live` verifies build identity, assets, ZIP, HTTP 404, security headers, request privacy, offline reload, Axe, mobile layout, and 200% text.
+
+## Run and verify
 
 ```sh
 npm ci
 npm test
 npm run typecheck
-npm run build
 npm run verify:deployment
-VERIFY_NODE_MODULES="$PWD/node_modules" /opt/fleet/lib/verify-url.sh https://reading-margin-recall.sociobot.in /tmp/rmr-verify
+npm run deploy:site
 ```
 
-The live build receipt names product commit `47e669cdb764d5fbeec7dccc6e5c2e510418b8d3`. Review base `a84aa7b9102e3a9b005e2d1f203f78b6c53e7c7e` differs from it only in prior verification documentation, not product code. Therefore the candidate-specific live gate rejects the current documentation-only SHA even though the served product assets match the product commit.
+## Known gaps and next steps
 
-## Next steps
-
-Address F-1-1 through F-1-23, then rerun the complete checklist from a fresh context. F-1-1 must be resolved before release: a realistic seeded note must be visible and actionable in the first viewport immediately after one click from Home.
+None for this work order.

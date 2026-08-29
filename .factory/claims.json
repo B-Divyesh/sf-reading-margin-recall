@@ -1,7 +1,7 @@
 [
   {
     "id": "source-linked-capture",
-    "claim": "Saves a selected passage with a gloss, hidden word, and source link.",
+    "claim": "You write the gloss, choose the hidden word, and save the passage with its source link.",
     "where": "landing steps, capture form, README",
     "test": "npm test -- --grep @claim:source-linked-capture",
     "sandbox": "fresh browser context; create one note and assert its text and source URL"
@@ -15,8 +15,8 @@
   },
   {
     "id": "demo-isolated",
-    "claim": "Demo changes never touch real notes.",
-    "where": "landing action note, demo banner, README",
+    "claim": "The demo loads three French, German, and Spanish sample notes, and demo changes never touch real notes.",
+    "where": "landing action note, demo screen, demo banner, README",
     "test": "npm test -- --grep @claim:demo-isolated",
     "sandbox": "seed a real namespace; reset and leave demo; assert the real note remains and demo storage is removed"
   },
@@ -50,10 +50,24 @@
   },
   {
     "id": "free-tools",
-    "claim": "Every tool is free to use without an account or subscription.",
+    "claim": "All tools are free to use without an account or subscription.",
     "where": "landing included section, terms, README",
     "test": "npm test -- --grep @claim:free-tools",
-    "sandbox": "fresh browser context; use both review filters and assert no sign-in, license gate, or cross-origin request"
+    "sandbox": "fresh browser context; assert capture, review, backup, and source tools have no sign-in, license gate, or billing request"
+  },
+  {
+    "id": "review-filters",
+    "claim": "Filters show difficult notes or notes from one source.",
+    "where": "landing free review tools section, review screen, README",
+    "test": "npm test -- --grep @claim:review-filters",
+    "sandbox": "fresh browser context; seed easy and difficult notes from two sources, apply each filter, and assert only matching notes remain"
+  },
+  {
+    "id": "json-transfer",
+    "claim": "A JSON backup moves notes between the extension and web app in either direction.",
+    "where": "extension popup, web notes toolbar, README",
+    "test": "npm test -- --grep @claim:json-transfer",
+    "sandbox": "fresh Chromium profile with the built extension; export an extension note into the web app, then export a web note and import it into the extension"
   },
   {
     "id": "delete-notes",
