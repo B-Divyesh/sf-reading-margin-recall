@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import AxeBuilder from '@axe-core/playwright';
 import { chromium } from '@playwright/test';
 
@@ -18,6 +19,16 @@ check(rootResponse.status === 200, `Live root returned ${rootResponse.status}.`)
 const localIndex = await readFile('dist/site/index.html');
 const liveIndex = Buffer.from(await rootResponse.arrayBuffer());
 check(sha256(liveIndex) === sha256(localIndex), 'Live index.html does not match the local production build.');
+const localBuildInfo = JSON.parse(await readFile('dist/site/build-info.json', 'utf8'));
+const buildInfoResponse = await fetch(new URL('/build-info.json', base), { cache: 'no-store' });
+check(buildInfoResponse.status === 200, `Build receipt returned ${buildInfoResponse.status}.`);
+const liveBuildInfo = await buildInfoResponse.json();
+check(JSON.stringify(liveBuildInfo) === JSON.stringify(localBuildInfo), 'Live build receipt does not match the local production build.');
+const candidate = process.env.RMR_CANDIDATE_SHA ?? execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+check(localBuildInfo.commit === candidate, `Local build receipt identifies ${localBuildInfo.commit}, not candidate ${candidate}.`);
+const remoteMain = execFileSync('git', ['ls-remote', 'origin', 'refs/heads/main'], { encoding: 'utf8' }).trim().split(/\s+/)[0];
+check(remoteMain === candidate, `origin/main identifies ${remoteMain}, not candidate ${candidate}.`);
+check(liveBuildInfo.commit === candidate, `Live build receipt identifies ${liveBuildInfo.commit}, not candidate ${candidate}.`);
 const localHtml = localIndex.toString('utf8');
 const assetPaths = [...localHtml.matchAll(/(?:src|href)="(\/assets\/[^"?]+\.(?:js|css))"/g)].map((match) => match[1]);
 check(assetPaths.length === 2, `Expected one built script and stylesheet, found ${assetPaths.length}.`);
@@ -44,6 +55,9 @@ check(zipResponse.status === 200, `Extension download returned ${zipResponse.sta
 check((zipResponse.headers.get('content-type') ?? '').includes('application/zip'), `Extension content type is ${zipResponse.headers.get('content-type')}.`);
 check(liveZip.length > 10_000 && liveZip.subarray(0, 2).toString() === 'PK', 'Extension response is not a valid-looking ZIP.');
 check(sha256(liveZip) === sha256(localZip), 'Live extension ZIP does not match the local production build.');
+check(liveBuildInfo.extension.path === zipPath, 'Live build receipt names the wrong extension path.');
+check(liveBuildInfo.extension.bytes === liveZip.length, 'Live build receipt has the wrong extension byte count.');
+check(liveBuildInfo.extension.sha256 === sha256(liveZip), 'Live build receipt has the wrong extension SHA-256.');
 
 const missingPath = `/release-check-not-found-${Date.now()}`;
 const missingUrl = new URL(missingPath, base).href;
@@ -157,6 +171,8 @@ try {
 
 console.log(JSON.stringify({
   base: base.href,
+  candidate,
+  buildReceipt: liveBuildInfo,
   assets: assetPaths,
   extension: { bytes: liveZip.length, sha256: sha256(liveZip), contentType: zipResponse.headers.get('content-type') },
   notFound: { status: missingResponse.status, cacheControl: notFoundCache, axeSeriousOrCritical: 0, thirdPartyRequests: 0 },

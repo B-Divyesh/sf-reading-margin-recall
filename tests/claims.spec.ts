@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { readFile, stat } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 
 test('@claim:source-linked-capture saves a full recall note', async ({ page }) => {
   await page.goto('/library');
@@ -84,13 +85,23 @@ test('@claim:free-tools @regression:no-dead-billing gives every tool without a l
   expect(deploymentConfig).not.toContain('api.sociobot.in');
 });
 
-test('@claim:extension-download @regression:production-download serves a valid MV3 package', async ({ request }) => {
+test('@claim:extension-download @regression:production-download serves the exact built MV3 package', async ({ request }) => {
   const response = await request.get('/downloads/reading-margin-recall-chrome.zip');
   expect(response.status()).toBe(200);
   expect(response.headers()['content-type']).toContain('application/zip');
-  expect((await response.body()).byteLength).toBeGreaterThan(10_000);
+  const servedArchive = await response.body();
+  expect(servedArchive.byteLength).toBeGreaterThan(10_000);
   const zipPath = 'dist/site/downloads/reading-margin-recall-chrome.zip';
   expect((await stat(zipPath)).size).toBeGreaterThan(10_000);
+  const builtArchive = await readFile(zipPath);
+  expect(createHash('sha256').update(servedArchive).digest('hex')).toBe(createHash('sha256').update(builtArchive).digest('hex'));
+  const buildReceipt = JSON.parse(await readFile('dist/site/build-info.json', 'utf8')) as { commit?: string; extension?: { bytes?: number; path?: string; sha256?: string } };
+  expect(buildReceipt.commit).toMatch(/^[0-9a-f]{40}$/);
+  expect(buildReceipt.extension).toEqual({
+    path: '/downloads/reading-margin-recall-chrome.zip',
+    bytes: servedArchive.byteLength,
+    sha256: createHash('sha256').update(servedArchive).digest('hex')
+  });
   expect(() => execFileSync('unzip', ['-t', zipPath], { stdio: 'pipe' })).not.toThrow();
   const manifest = JSON.parse(await readFile('.output/chrome-mv3/manifest.json', 'utf8')) as { manifest_version?: number };
   expect(manifest.manifest_version).toBe(3);

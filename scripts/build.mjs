@@ -1,5 +1,6 @@
-import { access, cp, mkdir, readdir, rm, stat } from 'node:fs/promises';
+import { access, cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 await rm('dist', { recursive: true, force: true });
@@ -14,4 +15,18 @@ if (!zip) throw new Error('WXT did not produce an extension zip.');
 const publicZip = 'dist/site/downloads/reading-margin-recall-chrome.zip';
 await cp(path.join(zipDir, zip), publicZip);
 await access('dist/site/404.html');
-if ((await stat(publicZip)).size < 10_000) throw new Error('The public extension zip is unexpectedly small.');
+const extensionBytes = await stat(publicZip);
+if (extensionBytes.size < 10_000) throw new Error('The public extension zip is unexpectedly small.');
+
+// The deployed site exposes this small, same-origin receipt. It lets the post-deploy
+// gate prove that the public installer and the commit handed to QA are one release.
+const commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+const archive = await readFile(publicZip);
+await writeFile('dist/site/build-info.json', `${JSON.stringify({
+  commit,
+  extension: {
+    path: '/downloads/reading-margin-recall-chrome.zip',
+    bytes: extensionBytes.size,
+    sha256: createHash('sha256').update(archive).digest('hex')
+  }
+}, null, 2)}\n`);

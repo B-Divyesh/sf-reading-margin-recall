@@ -110,6 +110,7 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   expect(config.responseOverrides).toEqual({ '404': { rewrite: '/404.html' } });
   expect(config.routes).toContainEqual({ route: '/', rewrite: '/index.html' });
   expect(config.routes).toContainEqual({ route: '/404.html', headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
+  expect(config.routes).toContainEqual({ route: '/build-info.json', headers: { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
   await access('site/404.html');
   await access('site/public/404.css');
   await access('dist/site/404.html');

@@ -44,7 +44,7 @@ npm run verify:live     # after deployment; checks build identity, ZIP, and bran
 ```
 
 `npm run build` builds the WXT extension, packages its zip, and writes the static deployment to `dist/site`. Deploy that directory as the site root.
-`npm run verify:live` compares the deployed script, stylesheet, and extension ZIP with that build. It also checks the live HTTP 404, product headers, request privacy, and Axe results.
+`npm run verify:live` compares the deployed script, stylesheet, extension ZIP, and same-origin build receipt with that build. It also proves the live receipt names the pushed candidate commit, then checks the live HTTP 404, product headers, request privacy, and Axe results.
 
 ## Product behavior
 
