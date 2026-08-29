@@ -1,0 +1,15 @@
+claim_id	result	command
+source-linked-capture	PASS	npm test -- --grep @claim:source-linked-capture
+extension-selection	PASS	npm test -- --grep @claim:extension-selection
+demo-isolated	PASS	npm test -- --grep @claim:demo-isolated
+local-only	PASS	npm test -- --grep @claim:local-only
+pwa-installable	PASS	npm test -- --grep @claim:pwa-installable
+offline-reload	PASS	npm test -- --grep @claim:offline-reload
+json-backup	PASS	npm test -- --grep @claim:json-backup
+keyboard-review	PASS	npm test -- --grep @claim:keyboard-review
+free-tools	PASS	npm test -- --grep @claim:free-tools
+review-filters	PASS	npm test -- --grep @claim:review-filters
+json-transfer	PASS	npm test -- --grep @claim:json-transfer
+delete-notes	PASS	npm test -- --grep @claim:delete-notes
+extension-download	PASS	npm test -- --grep @claim:extension-download
+http-source-links	PASS	npm test -- --grep @claim:http-source-links

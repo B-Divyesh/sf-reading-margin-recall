@@ -68,6 +68,15 @@ Audited 2026-08-29. Counts treat hyphenated terms and contractions as one word. 
 | Capture, review, JSON export, and demo Reset or Exit make no third-party requests. | 13 | Pass; exact `local-only` claim in Privacy and README |
 | The extension saves only the text you select in its local note store. | 13 | Pass; exact `extension-selection` claim in Privacy |
 
+## Retry 1 wording
+
+| Copy unit | Words | Result |
+| --- | ---: | --- |
+| Save selected passages as private, source-linked notes for later recall. | 10 | Pass; verb-first catalog description, 72 characters including the newline |
+| Move notes between the extension and web app | 8 | Pass; transfer section heading |
+| Export notes as JSON | 4 | Pass; result-naming action |
+| Import notes from JSON | 4 | Pass; result-naming action |
+
 ## Terminology
 
 | Concept | One term used |
