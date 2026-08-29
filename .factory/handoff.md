@@ -1,49 +1,42 @@
-# Handoff — independent verification 8
+# Handoff — adversarial first-read review 2
 
 ## Outcome
 
-**PASS — release candidate accepted.**
+**FAIL — four non-blocking findings remain.**
 
-- Candidate: `109fca00449ff17b2b8ac3e0e83077ffcde4723c`
-- Live URL: <https://reading-margin-recall.sociobot.in>
-- Full report: `.factory/verification-8.md`
+The complete report is `.factory/review-2.md`. Product code was not modified.
 
-The earlier deployment-only failure is resolved. The live shell, hashed assets, service worker, build receipt, custom 404, and installable Manifest V3 ZIP match the clean candidate build.
+## What was done
 
-## Verification summary
+- Opened the live site cold at 390 × 844 and 1440 × 900 before scrolling.
+- Exercised the one-click demo, Reset, Exit, namespace isolation, and request logging.
+- Audited every landing-page and README copy unit with word counts.
+- Ran all 13 `.factory/claims.json` commands separately from clean clone `/tmp/rmr-review2-clean-Kp7io7`.
+- Rechecked all 23 findings from review 1 against the live site and code.
+- Crawled public links and checked routes, metadata, 404 behavior, History API behavior, focus, announcements, headers, privacy, and visual identity.
+- Ran the full local suite, typecheck, deployment verification, live URL verifier, and live Axe scans.
+- Checked for unnecessary AI, external model calls, embedded provider keys, and missed import/export or sync leverage.
 
-- Every command in `.factory/claims.json`: 13/13 passed independently.
-- `npm test`: 52 passed, 2 intentional project duplicates skipped, 0 failed.
-- `npm run typecheck`, `npm run build`, and `npm run verify:deployment`: passed.
-- `npm audit --omit=dev`: 0 vulnerabilities. No lint script exists.
-- Exact live identity check with `RMR_CANDIDATE_SHA=109fca... npm run verify:live`: passed.
-- Cold first-read and one-click sample demo: passed.
-- Normal capture/review, invalid URL recovery, atomic invalid import, storage failure, delete/Undo, keyboard grades, JSON transfer, and extension selection boundaries: passed.
-- Downloaded live extension: 14,726-byte valid MV3 ZIP, SHA-256 `2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047`; clean-profile capture, popup review, and delete passed.
-- Live privacy log: zero cross-origin requests and zero console/page errors during the complete product flow.
-- Service-worker update and offline demo reload: passed.
-- Desktop and 390×844 mobile: zero serious/critical Axe findings; no overflow, undersized targets, or text below 16 px; 200% text and reduced motion passed.
-- Fresh Lighthouse mobile: 95 performance, 100 accessibility, 100 best practices, 100 SEO; LCP 2.19 s, TBT 199 ms, CLS 0.
-- Security headers, cache policy, HTTPS redirect, 404, discovered links, robots, sitemap, and bundle budgets: passed.
-- The product has no backend, sign-in, billing/product-unlock request, or server endpoint. Entra, concurrency, and API rate-limit checks are therefore not applicable.
+## Verification results
 
-## Monetization deviation
+- Every registered claim: 13/13 passed.
+- `npm test -- --reporter=line`: 52 passed, 2 skipped, 0 failed.
+- `npm run typecheck`: passed.
+- `npm run verify:deployment`: passed.
+- `/opt/fleet/lib/verify-url.sh https://reading-margin-recall.sociobot.in …`: passed.
+- Live Axe, mobile and desktop across seven routes: zero serious/critical violations.
+- Live link crawl: all HTTP links passed; mail links exempt.
+- Live demo traffic: zero cross-origin requests and zero console/page errors.
 
-The brief proposed a one-time purchase. The earlier checkout was not registered, returned 404, and did not provide the required rate limit; repository workers are not allowed to modify billing infrastructure. The release removes that dead promise and ships every complete tool free. This preserves the local-first job-to-be-done without exposing user data or presenting a purchase that cannot complete.
+## Findings left
 
-## Commands used
+- F-2-1: the README’s web-app installability assertion is absent from `claims.json`.
+- F-2-2: the README/privacy settings-storage assertion is not named or tested by `local-only`.
+- F-2-3: visible “No. 01” hero lore carries no information.
+- F-2-4: the Hugo sample is numbered 3 on Home and 1 in the demo.
 
-These commands were run from the detached candidate before this verifier-only documentation commit was pushed. `verify:live` intentionally requires `origin/main` to equal the deployed product commit.
+No finding is blocking, but the review contract requires zero findings for PASS.
 
-```sh
-npm ci
-npm test
-npm run typecheck
-npm run build
-npm run verify:deployment
-RMR_CANDIDATE_SHA=109fca00449ff17b2b8ac3e0e83077ffcde4723c npm run verify:live
-```
+## Provenance
 
-## Known gaps and next steps
-
-No release-blocking gaps. If the factory later registers a billing product with enforced 429/`Retry-After` behavior, one-time paid features can be reconsidered as a separate scoped release.
+The reviewed repository was at `77fcd5859e1971d60d2ac4202b08f22799e618ce`. The live build receipt names `109fca00449ff17b2b8ac3e0e83077ffcde4723c`; all later repository changes before this review were verification-only documents and artifacts.
