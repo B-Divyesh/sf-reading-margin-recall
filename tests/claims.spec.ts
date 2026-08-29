@@ -1,13 +1,64 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type TestInfo } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { readFile, stat } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { chromium } from '@playwright/test';
 import { createHash } from 'node:crypto';
+import { dirname, join, resolve } from 'node:path';
 
 declare const chrome: {
   storage: { local: { set(value: Record<string, unknown>): Promise<void>; get(key: string): Promise<Record<string, unknown>> } };
-  downloads: { search(query: Record<string, unknown>): Promise<Array<{ filename: string }>> };
+  downloads: { search(query: Record<string, unknown>): Promise<Array<{ filename: string; state: string; exists: boolean; bytesReceived: number; totalBytes: number; mime: string; byExtensionName?: string }>> };
 };
+
+async function openIsolatedTransferProfile(testInfo: TestInfo, label: string) {
+  const profileDirectory = testInfo.outputPath(`${label}-profile`);
+  const downloadDirectory = testInfo.outputPath(`${label}-downloads`);
+  await mkdir(join(profileDirectory, 'Default'), { recursive: true });
+  await mkdir(downloadDirectory, { recursive: true });
+  await writeFile(join(profileDirectory, 'Default', 'Preferences'), JSON.stringify({
+    download: {
+      default_directory: resolve(downloadDirectory),
+      directory_upgrade: true,
+      prompt_for_download: false
+    }
+  }));
+  const context = await chromium.launchPersistentContext(profileDirectory, {
+    headless: true,
+    channel: 'chromium',
+    acceptDownloads: true,
+    downloadsPath: downloadDirectory,
+    args: [`--disable-extensions-except=${process.cwd()}/.output/chrome-mv3`, `--load-extension=${process.cwd()}/.output/chrome-mv3`]
+  });
+  const extensionsPage = await context.newPage();
+  await extensionsPage.goto('chrome://extensions');
+  const extensionId = await extensionsPage.locator('extensions-manager').evaluate((manager) => manager.shadowRoot?.querySelector('extensions-item-list')?.shadowRoot?.querySelector('extensions-item')?.getAttribute('id'));
+  expect(extensionId).toBeTruthy();
+  await extensionsPage.close();
+  const popup = await context.newPage();
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  return { context, downloadDirectory, popup };
+}
+
+async function waitForCompletedExtensionBackup(popup: Awaited<ReturnType<typeof openIsolatedTransferProfile>>['popup'], downloadDirectory: string) {
+  let completed: { filename: string; state: string; exists: boolean; bytesReceived: number; totalBytes: number; mime: string; byExtensionName?: string } | undefined;
+  await expect.poll(async () => {
+    completed = await popup.evaluate(async () => (await chrome.downloads.search({
+      state: 'complete',
+      exists: true,
+      orderBy: ['-startTime'],
+      limit: 10
+    })).find((item) => item.byExtensionName === 'Reading Margin Recall' && item.mime === 'application/json'));
+    if (!completed || completed.state !== 'complete' || !completed.exists || completed.totalBytes < 1 || completed.bytesReceived !== completed.totalBytes) return false;
+    try {
+      const file = await stat(completed.filename);
+      return file.isFile() && file.size === completed.totalBytes;
+    } catch {
+      return false;
+    }
+  }, { message: 'extension backup download should finish in the isolated download directory', timeout: 15_000 }).toBe(true);
+  expect(resolve(dirname(completed!.filename))).toBe(resolve(downloadDirectory));
+  return completed!.filename;
+}
 
 test('@claim:source-linked-capture saves a full recall note', async ({ page }) => {
   await page.goto('/library');
@@ -167,19 +218,14 @@ test('@claim:review-filters shows difficult notes and one selected source', asyn
 test('@claim:json-transfer moves backups between the extension and web app both ways', async ({}, testInfo) => {
   test.setTimeout(60_000);
   test.skip(testInfo.project.name !== 'chromium');
-  const context = await chromium.launchPersistentContext('', {
-    headless: true,
-    channel: 'chromium',
-    acceptDownloads: true,
-    args: [`--disable-extensions-except=${process.cwd()}/.output/chrome-mv3`, `--load-extension=${process.cwd()}/.output/chrome-mv3`]
-  });
+  const extensionToWeb = await openIsolatedTransferProfile(testInfo, 'extension-to-web');
   try {
-    const extensionsPage = await context.newPage();
-    await extensionsPage.goto('chrome://extensions');
-    const extensionId = await extensionsPage.locator('extensions-manager').evaluate((manager) => manager.shadowRoot?.querySelector('extensions-item-list')?.shadowRoot?.querySelector('extensions-item')?.getAttribute('id'));
-    expect(extensionId).toBeTruthy();
-    const popup = await context.newPage();
-    await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+    const { context, downloadDirectory, popup } = extensionToWeb;
+    expect(await popup.evaluate(async () => (await chrome.storage.local.get('rmr:notes'))['rmr:notes'])).toBeUndefined();
+    const web = await context.newPage();
+    await web.goto('http://127.0.0.1:4173/library');
+    expect(await web.evaluate(() => localStorage.getItem('rmr:notes'))).toBeNull();
+
     await popup.evaluate(async () => {
       const now = new Date().toISOString();
       await chrome.storage.local.set({ 'rmr:notes': [{ id: 'from-extension', passage: 'Die Erinnerung wächst beim Wiederholen.', gloss: 'Memory grows through review.', deletion: 'Erinnerung', sourceUrl: 'https://example.com/extension-note', sourceTitle: 'Extension source', createdAt: now, dueAt: now, intervalDays: 0, reviews: 0 }] });
@@ -188,21 +234,23 @@ test('@claim:json-transfer moves backups between the extension and web app both 
     expect((await popup.getByLabel('Import notes from JSON').evaluate((input) => input.closest('label')!.getBoundingClientRect().height))).toBeGreaterThanOrEqual(44);
     await popup.getByRole('button', { name: 'Export notes as JSON' }).click();
     await expect(popup.locator('#live')).toHaveText('1 note exported for the web app.');
-    const extensionDownloadPath = await popup.evaluate(async () => (await chrome.downloads.search({ orderBy: ['-startTime'], limit: 1 }))[0]?.filename);
-    expect(extensionDownloadPath).toBeTruthy();
-    const extensionBackup = await readFile(extensionDownloadPath!);
+    const extensionDownloadPath = await waitForCompletedExtensionBackup(popup, downloadDirectory);
+    const extensionBackup = JSON.parse(await readFile(extensionDownloadPath, 'utf8')) as { version: number; notes: Array<{ id: string; passage: string }> };
+    expect(extensionBackup).toMatchObject({ version: 1, notes: [{ id: 'from-extension', passage: 'Die Erinnerung wächst beim Wiederholen.' }] });
+    await web.getByLabel('Import JSON').setInputFiles(extensionDownloadPath);
+    await expect(web.getByText('Die Erinnerung wächst beim Wiederholen.')).toBeVisible();
+    expect(JSON.parse((await web.evaluate(() => localStorage.getItem('rmr:notes')))!) as Array<{ id: string }>).toEqual([expect.objectContaining({ id: 'from-extension' })]);
+  } finally {
+    await extensionToWeb.context.close();
+  }
 
+  const webToExtension = await openIsolatedTransferProfile(testInfo, 'web-to-extension');
+  try {
+    const { context, downloadDirectory, popup } = webToExtension;
+    expect(await popup.evaluate(async () => (await chrome.storage.local.get('rmr:notes'))['rmr:notes'])).toBeUndefined();
     const web = await context.newPage();
     await web.goto('http://127.0.0.1:4173/library');
-    await web.evaluate((contents) => {
-      const transfer = new DataTransfer();
-      transfer.items.add(new File([contents], 'extension-backup.json', { type: 'application/json' }));
-      const input = document.querySelector<HTMLInputElement>('#import-file')!;
-      input.files = transfer.files;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    }, extensionBackup.toString('utf8'));
-    await expect(web.getByText('Die Erinnerung wächst beim Wiederholen.')).toBeVisible();
-
+    expect(await web.evaluate(() => localStorage.getItem('rmr:notes'))).toBeNull();
     await web.evaluate(() => {
       const now = new Date().toISOString();
       localStorage.setItem('rmr:notes', JSON.stringify([{ id: 'from-web', passage: 'La pratique rend les mots familiers.', gloss: 'Practice makes words familiar.', deletion: 'pratique', sourceUrl: 'https://example.com/web-note', sourceTitle: 'Web source', createdAt: now, dueAt: now, intervalDays: 0, reviews: 0 }]));
@@ -210,18 +258,16 @@ test('@claim:json-transfer moves backups between the extension and web app both 
     await web.reload();
     const webDownloadEvent = web.waitForEvent('download');
     await web.getByRole('button', { name: 'Export JSON' }).click();
-    const webBackup = await readFile((await (await webDownloadEvent).path())!);
-    await popup.evaluate((contents) => {
-      const transfer = new DataTransfer();
-      transfer.items.add(new File([contents], 'web-backup.json', { type: 'application/json' }));
-      const input = document.querySelector<HTMLInputElement>('#import-notes')!;
-      input.files = transfer.files;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    }, webBackup.toString('utf8'));
+    const webDownload = await webDownloadEvent;
+    const webBackupPath = join(downloadDirectory, 'web-to-extension.json');
+    await webDownload.saveAs(webBackupPath);
+    const webBackup = JSON.parse(await readFile(webBackupPath, 'utf8')) as { version: number; notes: Array<{ id: string; passage: string }> };
+    expect(webBackup).toMatchObject({ version: 1, notes: [{ id: 'from-web', passage: 'La pratique rend les mots familiers.' }] });
+    await popup.getByLabel('Import notes from JSON').setInputFiles(webBackupPath);
     await expect(popup.getByText('Web source')).toBeVisible();
     expect(await popup.evaluate(async () => ((await chrome.storage.local.get('rmr:notes'))['rmr:notes'] as Array<{ id: string }>)[0]?.id)).toBe('from-web');
   } finally {
-    await context.close();
+    await webToExtension.context.close();
   }
 });
 
