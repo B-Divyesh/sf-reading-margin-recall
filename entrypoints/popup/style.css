@@ -30,7 +30,7 @@ kbd { padding: 2px 4px; border: 1px solid currentColor; border-radius: 2px; font
 .transfer p { margin: 0 0 12px; color: #50635a; }
 .transfer > div { display: grid; gap: 8px; }
 .transfer .secondary, .transfer .source-link { width: 100%; justify-content: center; text-align: center; }
-.file-label { position: relative; display: inline-flex; align-items: center; }
+.file-label { position: relative; display: inline-flex; min-height: 44px; align-items: center; justify-content: center; cursor: pointer; }
 .file-label input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

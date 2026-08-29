@@ -122,8 +122,9 @@ test('@claim:json-transfer moves backups between the extension and web app both 
       await chrome.storage.local.set({ 'rmr:notes': [{ id: 'from-extension', passage: 'Die Erinnerung wächst beim Wiederholen.', gloss: 'Memory grows through review.', deletion: 'Erinnerung', sourceUrl: 'https://example.com/extension-note', sourceTitle: 'Extension source', createdAt: now, dueAt: now, intervalDays: 0, reviews: 0 }] });
     });
     await popup.reload();
+    expect((await popup.getByLabel('Import notes from JSON').evaluate((input) => input.closest('label')!.getBoundingClientRect().height))).toBeGreaterThanOrEqual(44);
     await popup.getByRole('button', { name: 'Export notes as JSON' }).click();
-    await expect(popup.locator('#live')).toHaveText('1 notes exported for the web app.');
+    await expect(popup.locator('#live')).toHaveText('1 note exported for the web app.');
     const extensionDownloadPath = await popup.evaluate(async () => (await chrome.downloads.search({ orderBy: ['-startTime'], limit: 1 }))[0]?.filename);
     expect(extensionDownloadPath).toBeTruthy();
     const extensionBackup = await readFile(extensionDownloadPath!);

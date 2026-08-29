@@ -45,7 +45,7 @@ async function exportNotes() {
   const url = URL.createObjectURL(blob);
   try {
     await browser.downloads.download({ url, filename: `reading-margin-recall-${new Date().toISOString().slice(0, 10)}.json`, saveAs: false });
-    document.querySelector('#live')!.textContent = `${notes.length} notes exported for the web app.`;
+    document.querySelector('#live')!.textContent = `${notes.length} ${notes.length === 1 ? 'note' : 'notes'} exported for the web app.`;
   } catch {
     document.querySelector('#live')!.textContent = 'The backup could not be downloaded. Check download permission, then try again.';
   } finally {
@@ -64,7 +64,7 @@ async function importNotes(event: Event) {
     await save();
     revealed = false;
     render();
-    document.querySelector('#live')!.textContent = `${notes.length} notes imported from the web app.`;
+    document.querySelector('#live')!.textContent = `${notes.length} ${notes.length === 1 ? 'note' : 'notes'} imported from the web app.`;
   } catch {
     input.value = '';
     document.querySelector('#live')!.textContent = 'That file could not be imported. Choose a complete Reading Margin Recall JSON backup.';
