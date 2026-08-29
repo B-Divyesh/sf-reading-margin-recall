@@ -1,42 +1,39 @@
-# Handoff — adversarial first-read review 2
+# Handoff — perfection-loop round 2
 
 ## Outcome
 
-**FAIL — four non-blocking findings remain.**
+**PASS — no review findings remain.**
 
-The complete report is `.factory/review-2.md`. Product code was not modified.
+The product repair is commit `0d71b5060c02cc6c68d3b45f8e258b2914b6bda8`.
+It is pushed to `main` and deployed at <https://reading-margin-recall.sociobot.in>.
 
-## What was done
+## What changed
 
-- Opened the live site cold at 390 × 844 and 1440 × 900 before scrolling.
-- Exercised the one-click demo, Reset, Exit, namespace isolation, and request logging.
-- Audited every landing-page and README copy unit with word counts.
-- Ran all 13 `.factory/claims.json` commands separately from clean clone `/tmp/rmr-review2-clean-Kp7io7`.
-- Rechecked all 23 findings from review 1 against the live site and code.
-- Crawled public links and checked routes, metadata, 404 behavior, History API behavior, focus, announcements, headers, privacy, and visual identity.
-- Ran the full local suite, typecheck, deployment verification, live URL verifier, and live Axe scans.
-- Checked for unnecessary AI, external model calls, embedded provider keys, and missed import/export or sync leverage.
+- Removed the decorative hero label and made the Home and demo preview use the same first sample note.
+- Registered and proved the installable web-app claim: manifest, My notes start URL, standalone display, required icons, and service worker.
+- Expanded the local-only claim to include color-theme settings and proved real/demo namespace separation while recording the request flow.
+- Retained the earlier review repair work: direct isolated demo, transfer in both directions, route/history/404/legal/accessibility coverage, and plain-language copy.
 
-## Verification results
+## Verification evidence
 
-- Every registered claim: 13/13 passed.
-- `npm test -- --reporter=line`: 52 passed, 2 skipped, 0 failed.
+- `npm ci && npm test -- --reporter=line`: **55 passed, 2 intentional mobile duplicates skipped**.
 - `npm run typecheck`: passed.
-- `npm run verify:deployment`: passed.
-- `/opt/fleet/lib/verify-url.sh https://reading-margin-recall.sociobot.in …`: passed.
-- Live Axe, mobile and desktop across seven routes: zero serious/critical violations.
-- Live link crawl: all HTTP links passed; mail links exempt.
-- Live demo traffic: zero cross-origin requests and zero console/page errors.
+- `npm run build` and `npm run verify:deployment`: passed. Production first-load assets are 27,232 bytes JS and 18,780 bytes CSS before gzip; the extension package is a valid 14,726-byte MV3 ZIP.
+- Every command in `.factory/claims.json` passed independently after `npm ci` in clean clone `/tmp/rmr-clean-qEI6Ml` at repair commit `0d71b5060c02cc6c68d3b45f8e258b2914b6bda8`.
+- `npm run deploy:site` completed, then `npm run verify:live` passed against the cold live deployment: receipt and asset hashes, extension ZIP, HTTP 404, CSP/security headers, request privacy, offline reload, current service worker, desktop keyboard flow, 390 px layout, 200% text, and Axe with zero serious/critical issues.
+- A second cold live browser check confirmed F-2-1 through F-2-4 directly. Screenshots: `.factory/verification-artifacts/polish-2-live-home-desktop.png` and `.factory/verification-artifacts/polish-2-live-demo-mobile.png`.
 
-## Findings left
+## Run and deploy
 
-- F-2-1: the README’s web-app installability assertion is absent from `claims.json`.
-- F-2-2: the README/privacy settings-storage assertion is not named or tested by `local-only`.
-- F-2-3: visible “No. 01” hero lore carries no information.
-- F-2-4: the Hugo sample is numbered 3 on Home and 1 in the demo.
+```sh
+npm ci
+npm test
+npm run typecheck
+npm run build
+npm run verify:deployment
+npm run deploy:site
+```
 
-No finding is blocking, but the review contract requires zero findings for PASS.
+## Known gaps / next steps
 
-## Provenance
-
-The reviewed repository was at `77fcd5859e1971d60d2ac4202b08f22799e618ce`. The live build receipt names `109fca00449ff17b2b8ac3e0e83077ffcde4723c`; all later repository changes before this review were verification-only documents and artifacts.
+None. The app remains local-first, free, and account-free; no AI or third-party runtime service was added because the product does not need one.

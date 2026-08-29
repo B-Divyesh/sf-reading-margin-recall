@@ -1,1 +1,1 @@
-Turn selected passages into private, source-linked review notes.
+Save selected passages as private, source-linked review notes.
