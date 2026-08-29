@@ -19,6 +19,26 @@ for (const route of ['/', '/demo', '/library', '/review', '/privacy', '/terms', 
   });
 }
 
+test('@regression:routes set unique titles, descriptions, canonicals, and social metadata', async ({ page }) => {
+  const routes = [
+    ['/', 'Reading Margin Recall — Save passages for review', '/'],
+    ['/?demo=1', 'Demo — Reading Margin Recall', '/?demo=1'],
+    ['/library', 'My notes — Reading Margin Recall', '/library'],
+    ['/review', 'Review — Reading Margin Recall', '/review'],
+    ['/privacy', 'Privacy — Reading Margin Recall', '/privacy'],
+    ['/terms', 'Terms — Reading Margin Recall', '/terms']
+  ] as const;
+  for (const [route, title, canonical] of routes) {
+    await page.goto(route);
+    await expect(page).toHaveTitle(title);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /^.{20,155}$/);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://reading-margin-recall.sociobot.in${canonical}`);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', title);
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', `https://reading-margin-recall.sociobot.in${canonical}`);
+    await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute('content', title);
+  }
+});
+
 test('@regression:mobile targets and readable text meet the 390px baseline on every route', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const route of ['/', '/demo', '/library', '/review?demo=1', '/privacy', '/terms', '/404.html']) {
@@ -95,10 +115,52 @@ test('@regression:built-404 is product-owned, accessible, and same-origin', asyn
   await expect(page).toHaveTitle('Page not found — Reading Margin Recall');
   await expect(page.getByRole('heading', { level: 1, name: 'We could not find this page' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Return home' })).toHaveAttribute('href', '/');
+  await expect(page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link')).toHaveCount(4);
+  await expect(page.getByRole('navigation', { name: 'Footer navigation' }).getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
+  await expect(page.getByRole('navigation', { name: 'Footer navigation' }).getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /not found/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://reading-margin-recall.sociobot.in/404.html');
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(1);
   const results = await new AxeBuilder({ page: page as never }).analyze();
   expect(results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
   expect(crossOrigin).toEqual([]);
   expect(errors).toEqual([]);
+});
+
+test('@regression:first-screen shows all facts and an actionable sample at required viewports', async ({ page }) => {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/');
+    for (const text of ['Stays on this device', 'Works after the first visit', 'All tools are free']) {
+      const box = await page.getByText(text, { exact: true }).boundingBox();
+      expect(box, `${text} is missing at ${viewport.width}px`).not.toBeNull();
+      expect(box!.y + box!.height, `${text} is below the first screen at ${viewport.width}px`).toBeLessThanOrEqual(viewport.height);
+    }
+    await page.getByRole('link', { name: 'Try it with sample data' }).click();
+    await expect(page).toHaveURL(/\?demo=1$/);
+    const sample = page.locator('.sample-sheet');
+    const action = page.getByRole('button', { name: 'Reveal sample answer' });
+    await expect(sample).toContainText('Life is a flower whose honey is love.');
+    const actionBox = await action.boundingBox();
+    expect(actionBox, `sample action is missing at ${viewport.width}px`).not.toBeNull();
+    expect(actionBox!.y + actionBox!.height, `sample action is below the first demo screen at ${viewport.width}px`).toBeLessThanOrEqual(viewport.height);
+  }
+});
+
+test('@regression:history restores scroll, focus, and live announcements', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => scrollTo(0, 900));
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(800);
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'My notes' }).evaluate((link: HTMLAnchorElement) => link.click());
+  await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
+  await expect(page.locator('#announcer')).toHaveText('Save a passage for later recall page loaded.');
+  await page.goBack();
+  await expect(page.getByRole('heading', { level: 1, name: 'Save passages for later recall' })).toBeFocused();
+  await expect(page.locator('#announcer')).toHaveText('Save passages for later recall page loaded.');
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(800);
+  await page.goForward();
+  await expect(page.getByRole('heading', { level: 1, name: 'Save a passage for later recall' })).toBeFocused();
+  await expect(page.locator('#announcer')).toHaveText('Save a passage for later recall page loaded.');
 });
 
 test('keyboard focus and reduced motion remain usable at 390px', async ({ page }) => {
@@ -150,7 +212,8 @@ test('deployment policy keeps execution and requests same-origin', async () => {
   await access('dist/site/404.html');
   const built404 = await readFile('dist/site/404.html', 'utf8');
   expect(built404).toContain('<h1>We could not find this page</h1>');
-  expect(built404).not.toMatch(/https?:\/\//);
+  const absoluteUrls = [...built404.matchAll(/https?:\/\/[^"'\s<]+/g)].map((match) => new URL(match[0]));
+  expect(absoluteUrls.every((url) => url.origin === 'https://reading-margin-recall.sociobot.in')).toBe(true);
 });
 
 test('@regression:build-site creates the complete deploy root from nothing', async ({}, testInfo) => {

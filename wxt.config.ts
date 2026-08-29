@@ -7,7 +7,7 @@ export default defineConfig({
     name: 'Reading Margin Recall',
     description: 'Turn selected passages into private, source-linked review notes.',
     version: '1.0.0',
-    permissions: ['storage', 'activeTab'],
+    permissions: ['storage', 'activeTab', 'downloads'],
     action: { default_title: 'Reading Margin Recall' },
     icons: {
       16: 'icons/16.png',

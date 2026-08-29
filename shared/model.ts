@@ -14,6 +14,12 @@ export interface ReadingNote {
   lastGrade?: RecallGrade;
 }
 
+export interface ReadingNotesBackup {
+  version: 1;
+  exportedAt: string;
+  notes: ReadingNote[];
+}
+
 /**
  * Source links are opened from both the web app and the extension. Keep the
  * accepted schemes deliberately narrow so a saved/imported note cannot become
@@ -48,6 +54,21 @@ export function isStoredReadingNote(value: unknown): value is ReadingNote {
 /** A backup may only introduce web links; legacy local notes remain safe to display without a link. */
 export function isReadingNote(value: unknown): value is ReadingNote {
   return isStoredReadingNote(value) && isHttpUrl(value.sourceUrl);
+}
+
+export function makeBackup(notes: ReadingNote[], exportedAt = new Date()): ReadingNotesBackup {
+  return { version: 1, exportedAt: exportedAt.toISOString(), notes };
+}
+
+export function parseBackup(value: unknown): ReadingNotesBackup | null {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+  const backup = value as Record<string, unknown>;
+  if (backup.version !== 1 || !Array.isArray(backup.notes) || !backup.notes.every(isReadingNote)) return null;
+  return {
+    version: 1,
+    exportedAt: typeof backup.exportedAt === 'string' ? backup.exportedAt : new Date(0).toISOString(),
+    notes: backup.notes
+  };
 }
 
 export function makeNote(input: Pick<ReadingNote, 'passage' | 'gloss' | 'deletion' | 'sourceUrl' | 'sourceTitle'>): ReadingNote {

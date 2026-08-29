@@ -6,8 +6,8 @@ test('@claim:offline-reload works after the first visit', async ({ page, context
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { level: 1, name: 'Explore saved sample passages' })).toBeVisible();
-  await expect(page.getByText('3 saved passages')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Review a sample passage' })).toBeVisible();
+  await expect(page.getByText('3 saved notes')).toBeVisible();
 });
 
 test('@regression:service-worker-update keeps one active current worker', async ({ page }) => {

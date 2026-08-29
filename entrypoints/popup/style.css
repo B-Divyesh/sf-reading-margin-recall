@@ -22,8 +22,15 @@ fieldset { margin: 18px 0 0; padding: 0; border: 0; } legend { margin-bottom: 8p
 .grades { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .grades button { border: 1px solid #2e6049; background: transparent; color: #18362b; }
 kbd { padding: 2px 4px; border: 1px solid currentColor; border-radius: 2px; font: 11px ui-monospace, monospace; }
-.footer-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 18px; }
+.footer-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
 .empty { margin-bottom: 20px; padding: 24px; border: 1px dashed #50635a; background: rgba(251,248,239,.7); }
 .empty span { display: block; color: #2e6049; font: 52px Georgia, serif; }
+.transfer { margin-top: 24px; padding-top: 20px; border-top: 1px solid #9aa69f; }
+.transfer h2 { margin: 0 0 8px; font: 500 21px/1.2 Georgia, serif; }
+.transfer p { margin: 0 0 12px; color: #50635a; }
+.transfer > div { display: grid; gap: 8px; }
+.transfer .secondary, .transfer .source-link { width: 100%; justify-content: center; text-align: center; }
+.file-label { position: relative; display: inline-flex; align-items: center; }
+.file-label input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

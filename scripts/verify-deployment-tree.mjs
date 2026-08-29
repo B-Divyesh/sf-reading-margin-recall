@@ -47,7 +47,12 @@ check(config.globalHeaders?.['Strict-Transport-Security']?.includes('max-age='),
 const notFound = await readFile(atSiteRoot('404.html'), 'utf8');
 check(notFound.includes('<title>Page not found — Reading Margin Recall</title>'), 'Deployment 404 has the wrong title.');
 check(notFound.includes('<h1>We could not find this page</h1>'), 'Deployment 404 has the wrong heading.');
-check(!/https?:\/\//.test(notFound), 'Deployment 404 includes a third-party URL.');
+const notFoundUrls = [...notFound.matchAll(/https?:\/\/[^"'\s<]+/g)].map((match) => new URL(match[0]));
+check(notFoundUrls.every((url) => url.origin === 'https://reading-margin-recall.sociobot.in'), 'Deployment 404 includes a third-party URL.');
+check(notFound.includes('aria-label="Main navigation"'), 'Deployment 404 is missing the main navigation.');
+check(notFound.includes('aria-label="Footer navigation"'), 'Deployment 404 is missing the footer navigation.');
+check(notFound.includes('<meta name="description"'), 'Deployment 404 is missing its description.');
+check(notFound.includes('rel="apple-touch-icon"'), 'Deployment 404 is missing its apple-touch icon.');
 
 console.log(JSON.stringify({
   siteRoot,
