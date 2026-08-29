@@ -41,6 +41,7 @@ The live checks use `https://reading-margin-recall.sociobot.in` and its named ro
 ## Verification evidence
 
 - `npm test`: 52 passed, 2 intentional project duplicates skipped.
+- Every claim command passed separately in clean clone `/tmp/rmr-clean-final-gQCu2v` at `72525aab1fce480bc446d48d164e70c91c321f6d`.
 - `npm run typecheck`: passed.
 - `npm run verify:deployment`: passed with a valid MV3 ZIP and matching build record.
 - Lighthouse mobile-local: performance 100, accessibility 100, best practices 100, SEO 100; LCP 1.5 s, CLS 0, TBT 30 ms.

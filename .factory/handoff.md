@@ -20,7 +20,7 @@ Export and import work in both directions, including import into an empty web co
 - `npm run typecheck`: passed.
 - `npm run build`: passed and produced `dist/site` plus the packaged extension ZIP.
 - `npm run verify:deployment`: passed.
-- Every `.factory/claims.json` command passed separately in clean clone `/tmp/rmr-clean-RBbDCI` at `ac861d960c29bf078d8ff3a3ade9a8a063d63474`.
+- Every `.factory/claims.json` command passed separately in clean clone `/tmp/rmr-clean-final-gQCu2v` at `72525aab1fce480bc446d48d164e70c91c321f6d`.
 - Playwright Axe found zero serious or critical issues across all routes, mobile routes, dark mode, the 404, and extension popup.
 - `verify-url.sh` passed with no console errors. Evidence: `.factory/evidence/polish-1/verify-url-local/verify.json`.
 - Lighthouse mobile-local: 100 performance, 100 accessibility, 100 best practices, and 100 SEO.
@@ -39,7 +39,7 @@ Screenshots:
 
 `npm run deploy:site` deployed verified product commit `ac861d960c29bf078d8ff3a3ade9a8a063d63474` successfully.
 `npm run verify:live` passed build identity, assets, ZIP, HTTP 404, security headers, request privacy, offline reload, Axe, mobile layout, and 200% text.
-The live ZIP was 14,703 bytes with SHA-256 `c75da540070d98d9ab35fc0c78bddb95fff2b6313c76cc82a9515436d73434d9`.
+The final extension ZIP is 14,726 bytes with SHA-256 `2d8f11053f80bb4f4fe21bc49f356cc55d2fc4869a54cf3d7721d4028d8ab047`.
 The live unknown route returned HTTP 404 with zero serious or critical Axe issues and zero third-party requests.
 A separate cold-browser pass rechecked the root, `/?demo=1`, history restoration, route announcements, and the complete 404 shell.
 Live Lighthouse scored 100 for performance, accessibility, best practices, and SEO.
