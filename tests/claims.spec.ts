@@ -132,6 +132,63 @@ test('@claim:local-only keeps notes and color settings local with no third-party
   expect(crossOrigin).toEqual([]);
 });
 
+test('@claim:no-tracking loads only the application module and sends no tracking signal', async ({ page, context }) => {
+  const origin = 'http://127.0.0.1:4173';
+  const requests: Array<{ url: string; type: string }> = [];
+  await page.addInitScript(() => {
+    const beaconCalls: string[] = [];
+    Object.defineProperty(window, '__rmrBeaconCalls', { value: beaconCalls, configurable: false });
+    const sendBeacon = navigator.sendBeacon.bind(navigator);
+    Object.defineProperty(Navigator.prototype, 'sendBeacon', {
+      configurable: true,
+      value(url: string | URL, data?: BodyInit | null) {
+        beaconCalls.push(String(url));
+        return sendBeacon(url, data);
+      }
+    });
+  });
+  context.on('request', (request) => requests.push({ url: request.url(), type: request.resourceType() }));
+
+  for (const route of ['/', '/demo', '/library', '/review', '/privacy', '/terms']) {
+    await page.goto(route);
+    const scripts = await page.locator('script[src]').evaluateAll((elements) => elements.map((element) => (element as HTMLScriptElement).src));
+    expect(scripts).toEqual([expect.stringMatching(/^http:\/\/127\.0\.0\.1:4173\/assets\/index-[\w-]+\.js$/)]);
+  }
+
+  await page.goto('/?demo=1');
+  await page.getByLabel('Selected passage *').fill('Je relis cette phrase demain.');
+  await page.getByLabel('Your gloss *').fill('I reread this sentence tomorrow.');
+  await page.getByLabel('Word to hide *').selectOption('demain');
+  await page.getByLabel('Source title *').fill('Tracking claim sample');
+  await page.getByLabel('Source URL *').fill('https://example.com/tracking-claim');
+  await page.getByRole('button', { name: 'Save review note' }).click();
+  await page.goto('/review?demo=1');
+  await page.keyboard.press('Space');
+  await page.keyboard.press('3');
+  await page.goto('/library?demo=1');
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export JSON' }).click();
+  await download;
+  await page.getByRole('button', { name: 'Reset demo' }).click();
+  await page.getByRole('button', { name: 'Exit demo and use my notes' }).click();
+
+  await page.goto('/404.html');
+  expect(await page.locator('script[src]').count()).toBe(0);
+  expect(await page.evaluate(() => ({
+    cookies: document.cookie,
+    localKeys: Object.keys(localStorage),
+    sessionKeys: Object.keys(sessionStorage),
+    beaconCalls: (window as typeof window & { __rmrBeaconCalls: string[] }).__rmrBeaconCalls
+  }))).toEqual({ cookies: '', localKeys: [], sessionKeys: [], beaconCalls: [] });
+  expect(await context.cookies()).toEqual([]);
+  expect(requests.every((request) => new URL(request.url).origin === origin)).toBe(true);
+  expect(requests.filter((request) => request.type === 'ping' || /(?:analytics|collect|beacon|pixel|track|telemetry)/i.test(new URL(request.url).pathname))).toEqual([]);
+  expect([...new Set(requests.filter((request) => request.type === 'script').map((request) => new URL(request.url).pathname))].sort()).toEqual([
+    expect.stringMatching(/^\/assets\/index-[\w-]+\.js$/),
+    '/sw.js'
+  ]);
+});
+
 test('@claim:pwa-installable provides a standalone My notes app controlled by its service worker', async ({ page }) => {
   await page.goto('/library');
   const details = await page.evaluate(async () => {
@@ -301,6 +358,41 @@ test('@claim:delete-notes removes a saved note from this device', async ({ page 
   await page.getByRole('button', { name: 'Delete' }).click();
   await expect(page.getByRole('heading', { name: 'No notes saved yet' })).toBeVisible();
   await expect.poll(() => page.evaluate(() => localStorage.getItem('rmr:notes'))).not.toContain('delete-me');
+});
+
+test('@claim:site-data-boundary clears web-app data without touching extension notes', async ({}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium');
+  const profile = await openIsolatedTransferProfile(testInfo, 'site-data-boundary');
+  try {
+    const { context, popup } = profile;
+    const web = await context.newPage();
+    await web.goto('http://127.0.0.1:4173/privacy');
+    await expect(web.getByText('Clear this site’s data to remove web-app notes and color settings.')).toBeVisible();
+    await expect(web.getByText('Delete extension notes from the extension separately.')).toBeVisible();
+    await web.evaluate(() => {
+      localStorage.setItem('rmr:notes', '[{"id":"web-note"}]');
+      localStorage.setItem('rmr:theme', 'dark');
+      localStorage.setItem('demo:rmr:notes', '[{"id":"demo-note"}]');
+      localStorage.setItem('demo:rmr:theme', 'light');
+    });
+    await popup.evaluate(async () => {
+      await chrome.storage.local.set({ 'rmr:notes': [{ id: 'extension-note', passage: 'Extension notes stay separate.' }] });
+    });
+    expect(await web.evaluate(() => Object.keys(localStorage).sort())).toEqual(['demo:rmr:notes', 'demo:rmr:theme', 'rmr:notes', 'rmr:theme']);
+
+    const session = await context.newCDPSession(web);
+    await session.send('Storage.clearDataForOrigin', { origin: 'http://127.0.0.1:4173', storageTypes: 'local_storage' });
+    await session.detach();
+
+    expect(await web.evaluate(() => Object.keys(localStorage))).toEqual([]);
+    await web.goto('http://127.0.0.1:4173/library');
+    await expect(web.getByRole('heading', { name: 'No notes saved yet' })).toBeVisible();
+    expect(await popup.evaluate(async () => (await chrome.storage.local.get('rmr:notes'))['rmr:notes'])).toEqual([
+      expect.objectContaining({ id: 'extension-note', passage: 'Extension notes stay separate.' })
+    ]);
+  } finally {
+    await profile.context.close();
+  }
 });
 
 test('@claim:http-source-links @regression:source-url-scheme rejects non-web URLs and never renders them as links', async ({ page }) => {

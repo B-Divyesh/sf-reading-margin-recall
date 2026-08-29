@@ -43,7 +43,7 @@ Audited 2026-08-29. Counts treat hyphenated terms and contractions as one word. 
 | The extension saves only the text you select. | 8 | Pass; `extension-selection` claim |
 | Read the privacy details | 4 | Pass |
 | No account | 2 | Pass; `free-tools` claim |
-| No tracking scripts | 3 | Pass; `local-only` claim |
+| No tracking scripts | 3 | Pass; `no-tracking` claim |
 | JSON backup and restore | 4 | Pass; `json-backup` claim |
 | Delete any note | 3 | Pass; `delete-notes` claim |
 | Free | 1 | Pass |
@@ -67,12 +67,14 @@ Audited 2026-08-29. Counts treat hyphenated terms and contractions as one word. 
 | Requests | 1 | Pass; privacy heading |
 | Capture, review, JSON export, and demo Reset or Exit make no third-party requests. | 13 | Pass; exact `local-only` claim in Privacy and README |
 | The extension saves only the text you select in its local note store. | 13 | Pass; exact `extension-selection` claim in Privacy |
+| Clear this site’s data to remove web-app notes and color settings. | 11 | Pass; `site-data-boundary` claim in Privacy |
+| Delete extension notes from the extension separately. | 7 | Pass; `site-data-boundary` claim in Privacy |
 
 ## Retry 1 wording
 
 | Copy unit | Words | Result |
 | --- | ---: | --- |
-| Save selected passages as private, source-linked notes for later recall. | 10 | Pass; verb-first catalog description, 72 characters including the newline |
+| Save passages as source-linked review notes for later recall. | 9 | Pass; verb-first catalog description, 62 characters including the newline |
 | Move notes between the extension and web app | 8 | Pass; transfer section heading |
 | Export notes as JSON | 4 | Pass; result-naming action |
 | Import notes from JSON | 4 | Pass; result-naming action |

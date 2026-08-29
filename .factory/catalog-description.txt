@@ -1,1 +1,1 @@
-Save selected passages as private, source-linked notes for later recall.
+Save passages as source-linked review notes for later recall.

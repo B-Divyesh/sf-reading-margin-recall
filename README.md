@@ -86,6 +86,8 @@ Import only the passages you choose.
 
 The site includes `/privacy` and `/terms`.
 Reading notes and settings stay in browser storage.
+Clear this site's data to remove web-app notes and color settings.
+Delete extension notes from the extension separately.
 
 ## Repository map
 

@@ -28,6 +28,13 @@
     "sandbox": "fresh real and demo contexts; change each color setting, capture and grade a note, export JSON, reset and exit the demo, assert the correct localStorage namespaces, and record only same-origin requests"
   },
   {
+    "id": "no-tracking",
+    "claim": "No tracking scripts load.",
+    "where": "landing privacy list",
+    "test": "npm test -- --grep @claim:no-tracking",
+    "sandbox": "fresh browser context; exercise every public route and a full demo flow; assert only the application module and service worker load, no cookie or unexpected browser identifier appears, no beacon runs, and no analytics request is sent"
+  },
+  {
     "id": "pwa-installable",
     "claim": "The web app can be installed and opens My notes.",
     "where": "README",
@@ -82,6 +89,13 @@
     "where": "landing privacy list, privacy page",
     "test": "npm test -- --grep @claim:delete-notes",
     "sandbox": "fresh browser context; seed one local note, confirm deletion, and assert it is absent from the page and storage"
+  },
+  {
+    "id": "site-data-boundary",
+    "claim": "Clear this site’s data to remove web-app notes and color settings. Delete extension notes from the extension separately.",
+    "where": "privacy page, README",
+    "test": "npm test -- --grep @claim:site-data-boundary",
+    "sandbox": "fresh Chromium profile with the built extension; seed web-app and extension notes, clear only the web origin’s local storage, and assert web notes/settings are gone while the extension note remains"
   },
   {
     "id": "extension-download",
