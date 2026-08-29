@@ -147,7 +147,7 @@ try {
   const reducedDuration = await mobilePage.locator('.button').first().evaluate((element) => Number.parseFloat(getComputedStyle(element).transitionDuration) || 0);
   check(reducedDuration <= 0.001, `Reduced-motion transition duration is ${reducedDuration}s.`);
   check((await severeAxeViolations(mobilePage)).length === 0, 'Live 390px landing has serious or critical Axe violations.');
-  await mobilePage.addStyleTag({ content: ':root { font-size: 32px !important; }' });
+  await mobilePage.evaluate(() => document.styleSheets[0]?.insertRule(':root { font-size: 32px !important; }'));
   const zoomOverflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   check(zoomOverflow <= 1, `The live landing overflows by ${zoomOverflow}px at 200% text.`);
   await mobile.close();
