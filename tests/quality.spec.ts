@@ -160,6 +160,34 @@ test('@claim:extension-selection captures only selected page text', async ({}, t
     await root.locator('#rmr-save').click();
     await expect(root.locator('.success')).toContainText('Passage saved');
     expect(await page.evaluate(() => localStorage.getItem('rmr:notes'))).toBeNull();
+
+    const extensionsPage = await context.newPage();
+    await extensionsPage.goto('chrome://extensions');
+    const extensionId = await extensionsPage.locator('extensions-manager').evaluate((manager) => {
+      const list = manager.shadowRoot?.querySelector('extensions-item-list')?.shadowRoot;
+      return list?.querySelector('extensions-item')?.getAttribute('id');
+    });
+    expect(extensionId).toBeTruthy();
+    await extensionsPage.close();
+
+    const popup = await context.newPage();
+    await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+    await expect(popup.getByRole('heading', { name: 'Recall the missing word' })).toBeVisible();
+    const popupAxe = await new AxeBuilder({ page: popup as never }).analyze();
+    expect(popupAxe.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
+    await popup.keyboard.press('Space');
+    await expect(popup.getByText(/Hidden word:/)).toBeVisible();
+    await popup.keyboard.press('4');
+    await expect(popup.getByText(/Hidden word:/)).not.toBeVisible();
+    const sourcePagePromise = context.waitForEvent('page');
+    await popup.getByRole('button', { name: 'Open original page' }).click();
+    const sourcePage = await sourcePagePromise;
+    await sourcePage.waitForLoadState('domcontentloaded');
+    expect(sourcePage.url()).toBe('http://127.0.0.1:4173/');
+    await sourcePage.close();
+    popup.once('dialog', (dialog) => dialog.accept());
+    await popup.getByRole('button', { name: 'Delete note' }).click();
+    await expect(popup.getByRole('heading', { name: 'Save a passage to begin' })).toBeVisible();
   } finally {
     await context.close();
   }

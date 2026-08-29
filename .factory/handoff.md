@@ -51,7 +51,7 @@ npm run verify:live
 
 ## Deployment
 
-- Repair commits through `fd57019` were pushed to `origin/main`; the final handoff/check-script commit follows them.
+- Repair and regression commits were pushed to `origin/main`. The deployed product assets correspond to `fd57019`; later commits contain only verification coverage and this handoff.
 - Deployed with `/opt/fleet/lib/deploy-static.sh reading-margin-recall dist/site`.
 - Final successful Azure deployment ID: `e1e83262-eb40-4c52-96f8-cf3db58cfb1a`.
 - Final live verification: `npm run verify:live` passed against the custom domain.
