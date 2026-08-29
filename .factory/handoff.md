@@ -28,8 +28,8 @@ The repair makes `dist/site` the explicit and only deployment root:
   independently asserts the installer/receipt identity at the upload root.
 - The existing product-owned `404.html` and `staticwebapp.config.json`
   response override remain in the deploy tree. The config returns HTTP 404,
-  product CSP/HSTS/nosniff/referrer headers, no-store error caching, and uses
-  only the product's own `404.css` and favicon assets.
+  product CSP/HSTS/nosniff/referrer headers, a 30-second must-revalidate error
+  cache policy, and uses only the product's own `404.css` and favicon assets.
 
 ## Evidence
 
@@ -74,7 +74,11 @@ The live command verifies the pushed candidate receipt, byte-identical
 HTML/assets/service worker/installer, the installer MIME type and digest,
 branded HTTP 404 and headers, no third-party requests, desktop demo capture
 and keyboard review, service-worker update and offline reload, 390 px mobile
-layout and text resize, reduced motion, and serious/critical Axe checks.
+layout and text resize, reduced motion, and serious/critical Axe checks. It
+passed after deployment with `200 application/zip`, 13,734 bytes, and SHA-256
+`ff977804d0ceebf1adbf93be8b0865ea9ef9d4675506456643e7287de578b6d0`; the
+branded unknown route returned HTTP 404 with zero serious/critical Axe issues
+and zero third-party requests.
 
 ## How to run
 
