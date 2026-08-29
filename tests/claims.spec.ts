@@ -36,17 +36,58 @@ test('@claim:demo-isolated keeps real notes separate', async ({ page }) => {
   expect(stored.demo).toBeNull();
 });
 
-test('@claim:local-only sends no reading data off origin', async ({ page }) => {
+test('@claim:local-only keeps notes and color settings local with no tracking requests', async ({ page }) => {
   const crossOrigin: string[] = [];
   page.on('request', (request) => { if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOrigin.push(request.url()); });
+  await page.goto('/library');
+  await page.getByRole('button', { name: 'Change color theme' }).click();
+  expect(await page.evaluate(() => localStorage.getItem('rmr:theme'))).toBe('dark');
+  expect(await page.evaluate(() => localStorage.getItem('demo:rmr:theme'))).toBeNull();
   await page.goto('/demo');
+  await page.getByRole('button', { name: 'Change color theme' }).click();
+  expect(await page.evaluate(() => localStorage.getItem('demo:rmr:theme'))).toBe('dark');
+  expect(await page.evaluate(() => localStorage.getItem('rmr:theme'))).toBe('dark');
   await page.getByLabel('Selected passage *').fill('Je relis cette phrase demain.');
   await page.getByLabel('Your gloss *').fill('I reread this sentence tomorrow.');
   await page.getByLabel('Word to hide *').selectOption('demain');
   await page.getByLabel('Source title *').fill('Private article');
   await page.getByLabel('Source URL *').fill('https://example.com/private');
   await page.getByRole('button', { name: 'Save review note' }).click();
+  const storage = await page.evaluate(() => ({ demoNotes: localStorage.getItem('demo:rmr:notes'), realNotes: localStorage.getItem('rmr:notes') }));
+  expect(storage.demoNotes).toContain('Je relis cette phrase demain.');
+  expect(storage.realNotes).toBeNull();
   expect(crossOrigin).toEqual([]);
+});
+
+test('@claim:pwa-installable provides a standalone My notes app controlled by its service worker', async ({ page }) => {
+  await page.goto('/library');
+  const details = await page.evaluate(async () => {
+    const manifestLink = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+    const manifestUrl = manifestLink?.href;
+    const manifest = manifestUrl ? await (await fetch(manifestUrl)).json() as {
+      start_url?: string; display?: string; icons?: Array<{ src?: string; sizes?: string; type?: string }>;
+    } : null;
+    const iconResponses = await Promise.all((manifest?.icons ?? []).map(async (icon) => ({
+      src: icon.src,
+      status: icon.src ? (await fetch(icon.src)).status : 0
+    })));
+    const registration = await navigator.serviceWorker.ready;
+    return { manifestUrl, manifest, iconResponses, activeWorker: registration.active?.scriptURL };
+  });
+  expect(details.manifestUrl).toBe('http://127.0.0.1:4173/manifest.webmanifest');
+  expect(details.manifest).toMatchObject({ start_url: '/library', display: 'standalone' });
+  expect(details.manifest?.icons).toEqual(expect.arrayContaining([
+    expect.objectContaining({ src: '/assets/icon-192.png', sizes: '192x192', type: 'image/png' }),
+    expect.objectContaining({ src: '/assets/icon-512.png', sizes: '512x512', type: 'image/png' })
+  ]));
+  expect(details.iconResponses).toEqual(expect.arrayContaining([
+    expect.objectContaining({ src: '/assets/icon-192.png', status: 200 }),
+    expect.objectContaining({ src: '/assets/icon-512.png', status: 200 })
+  ]));
+  expect(details.activeWorker).toBe('http://127.0.0.1:4173/sw.js');
+  await page.reload();
+  await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL)).toBe('http://127.0.0.1:4173/sw.js');
+  await expect(page.getByRole('heading', { level: 1, name: 'Save a passage for later recall' })).toBeVisible();
 });
 
 test('@claim:json-backup exports every demo note', async ({ page }) => {

@@ -24,7 +24,7 @@ Audited 2026-08-29. Counts treat hyphenated terms and contractions as one word. 
 | Price | 1 | Pass |
 | All tools are free | 4 | Pass; `free-tools` claim |
 | Each note keeps the passage, your gloss, and the original page link. | 12 | Pass; `source-linked-capture` claim |
-| Sample note 3 · due today | 6 | Pass |
+| Sample note 1 · due today | 6 | Pass; matches the first demo note |
 | Live review preview | 3 | Pass |
 | Recall the missing word | 4 | Pass |
 | La vie est une fleur dont l’amour est le _____. | 10 | Sample content |

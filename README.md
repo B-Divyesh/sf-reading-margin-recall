@@ -14,7 +14,7 @@ The product has two parts:
 Each part keeps its own local notes.
 Export a JSON backup from either part, then import it into the other.
 
-Reading notes stay in browser storage.
+Reading notes and color settings stay in browser storage.
 Capture and review make no third-party requests.
 The installed web app works offline after its first visit.
 The demo uses separate `demo:` storage and never touches real notes.

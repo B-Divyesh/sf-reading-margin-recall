@@ -22,10 +22,17 @@
   },
   {
     "id": "local-only",
-    "claim": "Reading notes stay on this device with no tracking requests.",
-    "where": "landing facts and privacy section, README",
+    "claim": "Reading notes and color settings stay in browser storage with no tracking requests.",
+    "where": "landing facts, privacy page, README",
     "test": "npm test -- --grep @claim:local-only",
-    "sandbox": "fresh demo context; intercept the full capture flow and assert every request is same-origin"
+    "sandbox": "fresh real and demo contexts; change each color setting, complete a capture flow, assert the correct localStorage namespace, and record only same-origin requests"
+  },
+  {
+    "id": "pwa-installable",
+    "claim": "The web app can be installed and opens My notes.",
+    "where": "README",
+    "test": "npm test -- --grep @claim:pwa-installable",
+    "sandbox": "fresh browser context; assert the linked manifest has standalone display, a My notes start URL, required icons, and an active controlling service worker"
   },
   {
     "id": "offline-reload",
